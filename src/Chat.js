@@ -4,7 +4,91 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import { UserData } from './App'
 import Debug from './Debug'
 
-// Tabs for switching between rooms
+// Modal (popup) prompting user to input room name
+class ModalRoomJoin extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			roomName: ''
+		};
+	}
+
+	handleChange(e) {
+		this.setState({
+			roomName: e.target.value
+		});
+	}
+
+	handleRoomJoin(e) {
+		if (this.state.roomName.length > 0) {
+
+			/* There is a strange bug with this operation where the 
+			previous input remains visible but is in fact an empty string.
+			It does no harm so I'm just leaving it here */
+			this.setState({
+    		roomName: ''
+    	});
+
+			// Perhaps because the modal closes itself before the next render routine ?
+
+			// So force clear the input field instead
+    	document.getElementById('room-join-modal-input').value = '';
+
+			this.props.onRoomJoin(this.state.roomName);
+		}
+	}
+
+	render() {
+		return(
+			<div 
+				id="room-join-modal" 
+				className="modal fade" 
+				role="dialog">
+			  <div className="modal-dialog modal-sm">
+
+			    <div className="modal-content">
+			      <div className="modal-header">
+			        <button 
+			        	type="button" 
+			        	className="close" 
+			        	data-dismiss="modal">
+			        	&times;
+			        </button>
+			        <h4 className="modal-title">Room</h4>
+			      </div>
+			      <div className="modal-body">
+			        <input 
+			        	id="room-join-modal-input"
+			          type="text" 
+			          className="form-control" 
+			          placeholder="Room name..." 
+			          onChange={ this.handleChange.bind(this) } />
+			      </div>
+			      <div className="modal-footer">
+			      	<button 
+			      		type="button" 
+			      		className="btn btn-default" 
+			      		data-dismiss="modal">
+			      		Close
+			      	</button>
+			      	<button 
+			      		type="button" 
+			      		className="btn btn-default" 
+			      		data-dismiss="modal" 
+			      		onClick={ this.handleRoomJoin.bind(this) }>
+			      		Join
+			      	</button>
+			      </div>
+			    </div>
+
+			  </div>
+			</div>
+		);
+	}
+}
+
+// Tabs for switching between rooms + room join/leave
 class Tabs extends Component {
 	constructor(props) {
 		super(props);
@@ -14,10 +98,8 @@ class Tabs extends Component {
     this.props.onRoomChange(room);
   }
 
-  handleRoomJoin() {
-    // TODO Better way
-    const roomName = prompt('Room name to join:');
-    if (roomName) this.props.onRoomJoin(roomName);
+  handleRoomLeave(e) {
+  	this.props.onRoomLeave();
   }
 
   getUserList() {
@@ -53,32 +135,33 @@ class Tabs extends Component {
 			          role="presentation" 
 			          key={ 'join' }>
 			          <a href="#"
-				          data-toggle="tooltip" 
-		      				data-placement="bottom" 
-		      				title="Join" 
-			          	onClick={ this.handleRoomJoin.bind(this) }>
-			          		[+]
-			          	</a>
+			      			data-toggle="modal" 
+		      				data-target="#room-join-modal">
+			          	[+]
+			          </a>
+		          </li>
+		          <li 
+			          role="presentation" 
+			          key={ 'leave' }
+			          className={ this.props.rooms.length > 0 ? "" : "disabled" }
+	      				onClick={ this.handleRoomLeave.bind(this) }>
+			          <a href="#">[-]</a>
 		          </li>
 	          	<li
 	          		role="presentation"
-	          		key={ 'userlist' }
-	          		className="pull-right">
-		          		<a href="#" 
-				      			id="userlist-toggle" 
-				      			data-toggle="popover" 
-			      				data-placement="bottom"
-			      				data-html="true" 
-			      				data-trigger="focus" 
-			      				title="Users"
-			      				data-content={ this.getUserList() }>
-				      			<span 
-				      				className="glyphicon glyphicon-user" 
-				      				data-toggle="tooltip" 
-				      				data-placement="bottom" 
-				      				title="Users">
-				      			</span>
-			      			</a>
+	          		className="pull-right"
+	          		data-toggle="tooltip" 
+	      				data-placement="left" 
+	      				title="Users"
+	          		key={ 'userlist' }>
+	          		<a href="#" 
+			      			data-toggle="popover" 
+		      				data-placement="bottom"
+		      				data-html="true" 
+		      				title="Users"
+		      				data-content={ this.getUserList() }>
+			      			<span className="glyphicon glyphicon-user"></span>
+		      			</a>
 	          	</li> 
 			      </ul>
 		      </div>
@@ -197,11 +280,11 @@ class InputField extends Component {
 
   handleSendMessage(e) {
     if (this.state.message.length > 0) {
-      this.props.onSendMessage(this.state.message, this.handleMessageSent.bind(this));
+      this.props.onSendMessage(this.state.message, this.isMessageSent.bind(this));
     }
   }
 
-  handleMessageSent(success) {
+  isMessageSent(success) {
   	if (success) {
     	this.setState({
     		message: ''
@@ -267,10 +350,11 @@ class Chat extends Component {
   componentDidMount() {
 
     // Join the room user has picked on Login screen
-    this.handleRoomJoin(this.props.roomName);
+    this.handleRoomJoin(this.props.roomName, () => {
 
-    // Timer to refresh the message timestamps
-    this.timer = setInterval(() => this.setState({ now: Date.now() }), 5000);
+    	// Timer to refresh the message timestamps
+    	this.timer = setInterval(() => this.setState({ now: Date.now() }), 5000);
+    });
   }
 
   componentWillUnmount() {
@@ -284,22 +368,60 @@ class Chat extends Component {
   }
 
   handleRoomJoin(roomName) {
-
-  	// Should be in practice be querying for an existing room
+  	// Should in practice be querying for an existing room
   	// and create an empty one only if the former can't be found. 
   	// But for the sake of this exercice, let's just init a new one every time.
 
-    const room = new RoomData(roomName, [this.props.user], []);
-    const roomList = this.state.rooms;
-    roomList.push(room);
+  	// Failsafe (validation handled by <ModalRoomJoin>)
+  	if (this.state.rooms.find(room => room.name === roomName)) {
+  		console.error('[Chat] Room already joined');
+  		return;
+  	}
+
+  	const room = new RoomData(roomName, [this.props.user], []);
+  	const roomsList = this.state.rooms;
+    roomsList.push(room);
 
     this.setState({
-      rooms: roomList,
+      rooms: roomsList,
       current: room
     });
   }
 
-  handleUserJoin(user) {
+  handleRoomLeave() {
+  	// Failsafe (validation handled by <Tab>)
+  	if (this.state.rooms.length < 1) {
+  		console.error('[Chat] No room to leave');
+  		return;
+  	}
+
+  	const current = this.state.current;
+  	const roomsList = this.state.rooms;
+  	const index = roomsList.indexOf(current);
+  	roomsList.splice(index, 1);
+
+  	let newCurrent;
+
+    if (roomsList.length === 0) {
+    	// Create dummy room
+			newCurrent = new RoomData('', [], []);
+		} else if (index === 0) {
+			newCurrent = roomsList[0];
+		} else if (index === roomsList.length - 1) {
+			// Switch to the room that was to the right
+			newCurrent = roomsList[index];
+		} else {
+			// Switch to the room that was to the left
+			newCurrent = roomsList[index - 1];
+		}
+
+    this.setState({
+  		rooms: roomsList,
+  		current: newCurrent
+  	});
+  }
+
+  handleUserJoin(user, callback) {
   	const current = this.state.current;
   	current.users.push(user);
 
@@ -310,7 +432,7 @@ class Chat extends Component {
   	});
   }
 
-  handleUserQuit(user) {
+  handleUserLeave(user) {
   	const current = this.state.current;
   	current.users.splice(user, 1);
 
@@ -329,11 +451,11 @@ class Chat extends Component {
       current: current
     });
 
-    callback(true);
+    callback(true); // Clear input field
   }
 
   // FOR DEBUG //
-  handleSendMessageFromUser(user, text) {
+  handleSendMessageAsUser(user, text) {
   	const current = this.state.current;
   	current.messages.push(new MessageData(user, text, Date.now()));
 
@@ -370,7 +492,7 @@ class Chat extends Component {
               rooms={ rooms } 
               current={ current } 
               onRoomChange={ this.handleRoomChange.bind(this) }
-              onRoomJoin={ this.handleRoomJoin.bind(this) } />
+              onRoomLeave={ this.handleRoomLeave.bind(this) } />
           </div>
           <div className="panel-body body-panel" id="scrollable">
             <ReactCSSTransitionGroup
@@ -389,8 +511,11 @@ class Chat extends Component {
         	myself={ this.props.user }
         	data={ this.state } 
         	addUser={ this.handleUserJoin.bind(this) }
-        	removeUser={ this.handleUserQuit.bind(this) }
-        	sendMessageFromUser={ this.handleSendMessageFromUser.bind(this) } />
+        	removeUser={ this.handleUserLeave.bind(this) }
+        	sendMessageAsUser={ this.handleSendMessageAsUser.bind(this) } />
+
+        <ModalRoomJoin 
+        	onRoomJoin={ this.handleRoomJoin.bind(this) }/>
 
       </div>
     );

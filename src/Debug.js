@@ -13,13 +13,13 @@ class Debug extends Component {
     this.props.removeUser(user);
   }
 
-  handleSendMessageFromUser(user, message) {
-    this.props.sendMessageFromUser(user, message);
+  handleSendMessageAsUser(user, message) {
+    this.props.sendMessageAsUser(user, message);
   }
 
   handleSendRandomMessages(count) {
     for (let i=0; i<count; i++) {
-      this.props.sendMessageFromUser(this.props.myself, 'Boo!');
+      this.props.sendMessageAsUser(this.props.myself, 'Boo!');
     }
   }
 
@@ -31,7 +31,7 @@ class Debug extends Component {
           <li><a href="#" onClick={ this.handleAddUsers.bind(this, 10) }>Add 10 users</a></li>
           <li><a href="#" onClick={ this.handleAddUsers.bind(this, 100) }>Add 100 users</a></li>
           <li><a href='#' onClick={ this.handleRemoveUser.bind(this, this.props.data.current.users[0]) }>Remove user</a></li>
-          <li><a href="#" onClick={ this.handleSendMessageFromUser.bind(this, this.props.data.current.users[0], 'Foo!') }>Send message from user</a></li>
+          <li><a href="#" onClick={ this.handleSendMessageAsUser.bind(this, this.props.data.current.users[0], 'Foo!') }>Send message from user</a></li>
           <li><a href='#' onClick={ this.handleSendRandomMessages.bind(this, 10) }>Send x random messages</a></li>
         </ul>
       </div>
