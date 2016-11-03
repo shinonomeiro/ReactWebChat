@@ -5,6 +5,11 @@ import Chat from './Chat';
 
 import './App.css';
 
+function UserData(name, avatar) {
+  this.name = name;
+  this.avatar = avatar;
+}
+
 // App
 class App extends Component {
   constructor(props) {
@@ -27,11 +32,11 @@ class App extends Component {
 
   render() {
     const isLoggedIn = this.state.isLoggedIn;
-    const userName = 'Frank';//this.state.userName;
-    const roomName = 'Buddies';//this.state.roomName;
+    const user = new UserData('Frank', ''); // TODO this.state.userName, this.state.avatar;
+    const roomName = 'Buddies'; // TODO this.state.roomName;
 
     const panel = !isLoggedIn ? // FIXME
-    <Chat userName={ userName } roomName={ roomName } /> : // FIXME
+    <Chat user={ user } roomName={ roomName } /> : // FIXME
     <Login onLogin={ this.handleLogin.bind(this) } />;
  
     return(panel);
@@ -39,3 +44,4 @@ class App extends Component {
 }
 
 export default App;
+export { UserData };

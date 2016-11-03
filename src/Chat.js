@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
+import { UserData } from './App'
 import Debug from './Debug'
 
 // Tabs for switching between rooms
@@ -19,13 +20,18 @@ class Tabs extends Component {
     if (roomName) this.props.onRoomJoin(roomName);
   }
 
-  handleUserList() {
+  getUserList() {
   	const users = this.props.current.users;
-  	console.log(users.toString());
   	let users_li = '';
-  	users.map(user => users_li += `<li>${user}</li>`);
-  	document.getElementById('userlist-toggle').setAttribute('data-content', users_li);
-	}
+
+  	users.map(user => { 
+  		user.name == this.props.user.name ? 
+  		users_li += `<li><strong>${user.name}</strong></li>` :
+  		users_li += `<li>${user.name}</li>`
+  	});
+
+  	return users_li;
+ 	}
 
   render() {
     let roomNames = this.props.rooms.map(
@@ -65,8 +71,7 @@ class Tabs extends Component {
 			      				data-html="true" 
 			      				data-trigger="focus" 
 			      				title="Users"
-			      				data-content=""
-				      			onClick={ this.handleUserList.bind(this) }>
+			      				data-content={ this.getUserList() }>
 				      			<span 
 				      				className="glyphicon glyphicon-user" 
 				      				data-toggle="tooltip" 
@@ -227,9 +232,8 @@ function RoomData(name, users, messages) {
   this.messages = messages;
 }
 
-function MessageData(sender, avatar, text, time) {
+function MessageData(sender, text, time) {
   this.sender = sender;
-  this.avatar = avatar;
   this.text = text;
   this.time = time;
 }
@@ -250,9 +254,9 @@ class Chat extends Component {
   }
 
   componentDidMount() {
-  	
+
     // Join the room user has picked on Login screen
-    this.handleRoomJoin('Buddies') // this.props.roomName
+    this.handleRoomJoin(this.props.roomName);
 
     // Timer to refresh the message timestamps
     this.timer = setInterval(() => this.setState({ now: Date.now() }), 5000);
@@ -274,7 +278,7 @@ class Chat extends Component {
   	// and create an empty one only if the former can't be found. 
   	// But for the sake of this exercice, let's just init a new one every time.
 
-    const room = new RoomData(roomName, [], []);
+    const room = new RoomData(roomName, [this.props.user], []);
     const roomList = this.state.rooms;
     roomList.push(room);
 
@@ -284,9 +288,18 @@ class Chat extends Component {
     });
   }
 
+  handleUserJoin(user) {
+  	const current = this.state.current;
+  	current.users.push(user);
+
+  	this.setState({
+  		current: current
+  	});
+  }
+
   handleSendMessage(text, callback) {
     const current = this.state.current;
-    current.messages.push(new MessageData(this.props.userName, this.props.avatar, text, Date.now()));
+    current.messages.push(new MessageData(this.props.user, text, Date.now()));
 
     this.setState({
       current: current
@@ -304,11 +317,11 @@ class Chat extends Component {
       current.messages.map(
         (message, index) =>
         <Message 
-          name={ message.sender } 
-          avatar={ message.avatar }
+          name={ message.sender.name } 
+          avatar={ message.sender.avatar }
           message={ message.text } 
           time={ Math.floor((now - message.time) / 1000 / 60) } 
-          isMyMessage={ message.sender === this.props.userName }
+          isMyMessage={ message.sender.name === this.props.user.name }
           key={ index }
           id={ index } /* 'key' seems to be a hidden prop */ />
       );
@@ -317,7 +330,8 @@ class Chat extends Component {
       <div className="container-fluid">
         <div className="panel panel-default">
           <div className="panel-heading">
-            <Tabs 
+            <Tabs
+            	user={ this.props.user } 
               rooms={ rooms } 
               current={ current } 
               onRoomChange={ this.handleRoomChange.bind(this) }
