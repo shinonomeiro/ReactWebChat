@@ -168,6 +168,17 @@ class Message extends Component {
   }
 }
 
+// Chat events such as join, quit, etc.
+class EventMessage extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return(null);
+	}
+}
+
 // Input field for message
 class InputField extends Component {
   constructor(props) {
@@ -292,6 +303,19 @@ class Chat extends Component {
   	const current = this.state.current;
   	current.users.push(user);
 
+  	// TODO Notify
+
+  	this.setState({
+  		current: current
+  	});
+  }
+
+  handleUserQuit(user) {
+  	const current = this.state.current;
+  	current.users.splice(user, 1);
+
+  	// TODO Notify
+
   	this.setState({
   		current: current
   	});
@@ -307,6 +331,17 @@ class Chat extends Component {
 
     callback(true);
   }
+
+  // FOR DEBUG //
+  handleSendMessageFromUser(user, text) {
+  	const current = this.state.current;
+  	current.messages.push(new MessageData(user, text, Date.now()));
+
+  	this.setState({
+  		current: current
+  	});
+  }
+  // // // // //
 
   render() {
     const rooms = this.state.rooms;
@@ -349,7 +384,14 @@ class Chat extends Component {
             <InputField onSendMessage={ this.handleSendMessage.bind(this) }/>
           </div>
         </div>
-        <Debug data={ this.state }/>
+
+        <Debug
+        	myself={ this.props.user }
+        	data={ this.state } 
+        	addUser={ this.handleUserJoin.bind(this) }
+        	removeUser={ this.handleUserQuit.bind(this) }
+        	sendMessageFromUser={ this.handleSendMessageFromUser.bind(this) } />
+
       </div>
     );
   }

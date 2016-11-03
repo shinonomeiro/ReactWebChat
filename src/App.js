@@ -32,7 +32,7 @@ class App extends Component {
 
   render() {
     const isLoggedIn = this.state.isLoggedIn;
-    const user = new UserData('Frank', ''); // TODO this.state.userName, this.state.avatar;
+    const user = new UserData('Frank', '/avatars/001.png'); // TODO this.state.userName, this.state.avatar;
     const roomName = 'Buddies'; // TODO this.state.roomName;
 
     const panel = !isLoggedIn ? // FIXME
