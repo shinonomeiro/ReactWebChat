@@ -239,11 +239,10 @@ class Chat extends Component {
   constructor(props) {
     super(props);
 
-    const initialRoom = new RoomData('Buddies', [], []); // TODO
-
     this.state = { 
-      rooms: [initialRoom],
-      current: initialRoom,
+      rooms: [],
+      // Dummy room needed for proper initialization
+      current: new RoomData('', [], []),
       now: Date.now()
     };
 
@@ -251,6 +250,11 @@ class Chat extends Component {
   }
 
   componentDidMount() {
+  	
+    // Join the room user has picked on Login screen
+    this.handleRoomJoin('Buddies') // this.props.roomName
+
+    // Timer to refresh the message timestamps
     this.timer = setInterval(() => this.setState({ now: Date.now() }), 5000);
   }
 
@@ -265,6 +269,11 @@ class Chat extends Component {
   }
 
   handleRoomJoin(roomName) {
+
+  	// Should be in practice be querying for an existing room
+  	// and create an empty one only if the former can't be found. 
+  	// But for the sake of this exercice, let's just init a new one every time.
+
     const room = new RoomData(roomName, [], []);
     const roomList = this.state.rooms;
     roomList.push(room);
