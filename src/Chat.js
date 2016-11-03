@@ -21,6 +21,7 @@ class Tabs extends Component {
 
   handleUserList() {
   	const users = this.props.current.users;
+  	console.log(users.toString());
   	let users_li = '';
   	users.map(user => users_li += `<li>${user}</li>`);
   	document.getElementById('userlist-toggle').setAttribute('data-content', users_li);
@@ -238,47 +239,13 @@ class Chat extends Component {
   constructor(props) {
     super(props);
 
-    this.jsonData = `[
-      {
-        "name": "Buddies",
-        "users": [
-          "Alice",
-          "Bob"
-        ],
-        "messages": [
-          {
-            "sender": "Bob",
-            "avatar": "/avatars/001.png",
-            "text": "Lorem ipsum blablabla Lorem ipsum blablabla Lorem ipsum blablabla...",
-            "time": "1478009180833"
-          },
-          {
-            "sender": "Alice",
-            "avatar": "http://vignette1.wikia.nocookie.net/fictionalcrossover/images/4/49/A_Gomez.png",
-            "text": "Oh, come on, Bob! なんでやねん！",
-            "time": "1478019280833"
-          }
-        ]
-      }
-    ]`;
+    const initialRoom = new RoomData('Buddies', [], []); // TODO
 
-    this.roomData = JSON.parse(this.jsonData);
-
-    // Sample existing rooms
-
-    const roomList = this.roomData.map(
-      room => new RoomData(room.name, room.users, room.messages.map(
-        message => new MessageData(message.sender, message.avatar, message.text, message.time)
-      ))
-    );
-    
     this.state = { 
-      rooms: roomList,
-      current: roomList[0],
+      rooms: [initialRoom],
+      current: initialRoom,
       now: Date.now()
     };
-
-    // this.handleRoomJoin('Test');
 
     this.timer = null;
   }
