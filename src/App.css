@@ -1,0 +1,58 @@
+.body-panel {
+  overflow-y: auto;
+  height: 300px;
+}
+
+.media.message .avatar {
+  height: 30px;
+  width: 30px;
+}
+
+.media.message .message-text {
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+  word-break: break-all; 
+  word-wrap: break-word;
+}
+
+.media.message .glyphicon-time {
+  margin-right: 5px;
+}
+
+.messageFade-enter {
+  opacity: 0.01;
+}
+
+.messageFade-enter.messageFade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.messageFade-leave {
+  opacity: 1;
+}
+
+.messageFade-leave.messageFade-leave-active {
+  opacity: 0.01;
+  transition: opacity 100ms ease-in;
+}
+
+::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+    width: 6px;
+    background-color: #F5F5F5;
+    scroll-snap-align: end;
+}
+
+::-webkit-scrollbar-thumb
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #999;
+}
