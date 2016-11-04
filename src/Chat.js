@@ -102,6 +102,19 @@ class Tabs extends Component {
   	this.props.onRoomLeave();
   }
 
+ 	getRoomNames() {
+ 		let roomNames = this.props.rooms.map(
+      room => 
+      <li 
+        role="presentation" 
+        key={ room.name } 
+        className={ room === this.props.current ? "active" : "" }>
+        <a href="#" onClick={ this.handleRoomChange.bind(this, room) }>{ room.name }</a>
+      </li>);
+
+ 		return roomNames;
+ 	}
+
   getUserList() {
   	const users = this.props.current.users;
   	let users_li = '';
@@ -116,21 +129,12 @@ class Tabs extends Component {
  	}
 
   render() {
-    let roomNames = this.props.rooms.map(
-      room => 
-      <li 
-        role="presentation" 
-        key={ room.name } 
-        className={ room === this.props.current ? "active" : "" }>
-        <a href="#" onClick={ this.handleRoomChange.bind(this, room) }>{ room.name }</a>
-      </li>);
-
     return(
     	<div>
     		<div className="row">
     			<div className="col-xs-12">
 			      <ul className="nav nav-tabs">
-			        { roomNames }
+			        { this.getRoomNames() }
 			        <li 
 			          role="presentation" 
 			          key={ 'join' }>
@@ -320,10 +324,13 @@ class InputField extends Component {
   }
 }
 
-function RoomData(name, users, messages) {
+function RoomData(name, users, messages, scrollState) {
   this.name = name;
   this.users = users;
-  this.messages = messages;
+  this.messages = messages || [];
+
+  // Offset in px from bottom of scroll view
+  this.scrollState = scrollState || 0;
 }
 
 function MessageData(sender, text, time) {
@@ -340,7 +347,7 @@ class Chat extends Component {
     this.state = { 
       rooms: [],
       // Dummy room needed for proper initialization
-      current: new RoomData('', [], []),
+      current: new RoomData(null, []),
       now: Date.now()
     };
 
@@ -350,11 +357,10 @@ class Chat extends Component {
   componentDidMount() {
 
     // Join the room user has picked on Login screen
-    this.handleRoomJoin(this.props.roomName, () => {
+    this.handleRoomJoin(this.props.roomName);
 
-    	// Timer to refresh the message timestamps
-    	this.timer = setInterval(() => this.setState({ now: Date.now() }), 5000);
-    });
+    // Timer to refresh the message timestamps
+  	this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
   }
 
   componentWillUnmount() {
@@ -362,15 +368,39 @@ class Chat extends Component {
   }
 
   handleRoomChange(room) {
+  	let s = document.getElementById('scrollable');
+  	const current = this.state.current;
+
+  	// Save the state
+  	current.scrollState = s.scrollHeight - s.scrollTop - s.clientHeight;
+
     this.setState({
       current: room
     });
+
+    // Restore the scrollbar position to its saved position
+
+    // Got to use the hack below because React doesn't 
+    // seem to provide any "post-render" facility.
+
+    let updateScrollBar = () => {
+    	s = document.getElementById('scrollable');
+		  s.scrollTop = s.scrollHeight - this.state.current.scrollState - s.clientHeight;
+	  };
+
+	  // Hard-coded value, could do better but for now it works
+    setTimeout(updateScrollBar, 50);
+
+    // 						Current
+    // Previous room ----> [ New room ]
   }
 
   handleRoomJoin(roomName) {
-  	// Should in practice be querying for an existing room
-  	// and create an empty one only if the former can't be found. 
-  	// But for the sake of this exercice, let's just init a new one every time.
+  	/* 
+  	Should in practice be querying for an existing room
+  	and create an empty one only if the former can't be found. 
+  	But for the sake of this exercice, let's just init a new one every time. 
+  	*/
 
   	// Failsafe (validation handled by <ModalRoomJoin>)
   	if (this.state.rooms.find(room => room.name === roomName)) {
@@ -378,7 +408,7 @@ class Chat extends Component {
   		return;
   	}
 
-  	const room = new RoomData(roomName, [this.props.user], []);
+  	const room = new RoomData(roomName, [this.props.user]);
   	const roomsList = this.state.rooms;
     roomsList.push(room);
 
@@ -404,7 +434,7 @@ class Chat extends Component {
 
     if (roomsList.length === 0) {
     	// Create dummy room
-			newCurrent = new RoomData('', [], []);
+			newCurrent = new RoomData(null, []);
 		} else if (index === 0) {
 			newCurrent = roomsList[0];
 		} else if (index === roomsList.length - 1) {
