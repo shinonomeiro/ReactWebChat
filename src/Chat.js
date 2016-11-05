@@ -119,17 +119,19 @@ class Tabs extends Component {
   	const users = this.props.current.users;
   	let users_li = [];
 
-  	users.map(user => { 
+  	users.map((user, index) => { 
   		const avatarImg = 
   			<img 
   				src={ user.avatar }
-  				alt="///"
+  				alt="(´Д`|||)"
   				width="30px"
   				height="30px" />
 
   		if (user.name === this.props.user.name) {
   			users_li.push(
-  			<li className="text-center"> 
+  			<li 
+  				className="text-center" 
+  				key={ index }> 
   				{ avatarImg }
   				<strong>
   					{ user.name }
@@ -137,7 +139,9 @@ class Tabs extends Component {
   			</li>);
   		} else {
   			users_li.push(
-  			<li className="text-center">
+  			<li 
+  				className="text-center" 
+  				key={ index }>
   				{ avatarImg }
   				{ user.name }
   			</li>);
@@ -226,27 +230,39 @@ function formatTimestamp(time) {
   return `${time} ${label} ago`;
 }
 
+function Message(props) {
+	return(
+		null
+	);
+}
+
+Message.updateScrollBar = (messageId) => {
+	const s = document.getElementById('scrollable');
+	const scrollBottom = s.scrollHeight - s.scrollTop - s.clientHeight;
+	const m = document.getElementById('message-' + messageId);
+
+	// If scrollview is already at the bottom
+	if (scrollBottom < m.clientHeight + 20) {
+		// Move alongside to display the new message
+		s.scrollTop = s.scrollHeight;
+	}
+}
+
 // Chat message
-class Message extends Component {
+class UserMessage extends Component {
 	constructor(props) {
 		super(props);
 	}
 
 	componentDidMount() {
-		const s = document.getElementById('scrollable');
-		const scrollBottom = s.scrollHeight - s.scrollTop - s.clientHeight;
-		const m = document.getElementById('message-' + this.props.id);
-
-		// If scrollview is already at the bottom
-		if (scrollBottom < m.clientHeight + 20) {
-			// Move alongside to display the new message
-			s.scrollTop = s.scrollHeight;
-		}
+		Message.updateScrollBar(this.props.id);
 	}
 
   render() {
     return(
-      <div className="media message" id={ "message-" + this.props.id }>
+      <div 
+      	className="media user-message" 
+      	id={ "message-" + this.props.id }>
         { !this.props.isMyMessage && 
         <div className="media-left media-middle">
           <img 
@@ -280,10 +296,50 @@ class Message extends Component {
 class EventMessage extends Component {
 	constructor(props) {
 		super(props);
+
+		this.message = null;
+	}
+
+	componentDidMount() {
+		Message.updateScrollBar(this.props.id);
+	}
+
+	formatMessageFromType() {
+		/*
+			Event types:
+				- User join
+				- User quit
+		*/
+
+		let text = '';
+		let color;
+
+		if (this.props.eventType === 'join') {
+			text = this.props.user.name + ' has joined the room.';
+			color = { color: 'green' }
+		} else if (this.props.eventType === 'quit') {
+			text = this.props.user.name + ' has left the room.';
+			color = { color: 'gray' }
+		}
+
+		return(
+			<div
+				className="media event-message"
+				id={ "message-" + this.props.id }>
+				<div className="media-body">
+					<img
+						src={ this.props.user.avatar }
+						alt="(´Д`|||)"
+						width="30px"
+						height="30px" />
+					<span style={ color }>{ text }</span>
+				</div>
+			</div>
+		);
 	}
 
 	render() {
-		return(null);
+		return(this.formatMessageFromType());
 	}
 }
 
@@ -348,7 +404,8 @@ class InputField extends Component {
 function RoomData(name, users, messages, scrollState) {
   this.name = name;
   this.users = users;
-  this.messages = messages || [];
+  this.messages =  [];
+  this.messageJsx = [];
 
   // Offset in px from bottom of scroll view
   this.scrollState = scrollState || 0;
@@ -474,23 +531,43 @@ class Chat extends Component {
   	});
   }
 
-  handleUserJoin(user, callback) {
+  handleUserJoin(user, time) {
   	const current = this.state.current;
   	current.users.push(user);
 
-  	// TODO Notify
+  	const now = this.state.now;
+  	const index = current.messageJsx.length;
+
+  	current.messageJsx.push(
+  		<EventMessage
+  			eventType="join"
+  			user={ user }
+  			time={ Math.floor((now - time) / 1000 / 60) }
+  			key={ index }
+  			id={ index } />
+  	);
 
   	this.setState({
   		current: current
   	});
   }
 
-  handleUserLeave(user) {
+  handleUserLeave(user, time) {
   	const current = this.state.current;
-  	const index = current.users.indexOf(user);
-  	current.users.splice(index, 1);
+  	const userIndex = current.users.indexOf(user);
+  	current.users.splice(userIndex, 1);
 
-  	// TODO Notify
+  	const now = this.state.now;
+  	const index = current.messageJsx.length;
+
+  	current.messageJsx.push(
+  		<EventMessage
+  			eventType="quit"
+  			user={ user }
+  			time={ Math.floor((now - time) / 1000 / 60) }
+  			key={ index }
+  			id={ index } />
+  	);
 
   	this.setState({
   		current: current
@@ -502,8 +579,23 @@ class Chat extends Component {
   		return;
   	}
 
+  	const message = new MessageData(this.props.user, text, Date.now());
     const current = this.state.current;
-    current.messages.push(new MessageData(this.props.user, text, Date.now()));
+    current.messages.push(message);
+
+    const now = this.state.now;
+    const index = current.messageJsx.length;
+
+    current.messageJsx.push(
+    	<UserMessage 
+          name={ message.sender.name } 
+          avatar={ message.sender.avatar }
+          message={ message.text } 
+          time={ Math.floor((now - message.time) / 1000 / 60) } 
+          isMyMessage={ message.sender.name === this.props.user.name }
+          key={ index }
+          id={ index } /* 'key' seems to be a hidden prop */ />
+    );
 
     this.setState({
       current: current
@@ -518,20 +610,15 @@ class Chat extends Component {
   		return;
   	}
 
+  	const message = new MessageData(user, text, Date.now());
   	const current = this.state.current;
-  	current.messages.push(new MessageData(user, text, Date.now()));
+  	current.messages.push(message);
 
-  	this.setState({
-  		current: current
-  	});
-  }
-  // // // // //
+  	const now = this.state.now;
+  	const index = current.messageJsx.length;
 
-  getMessageList(current, now) {
-  	const messages = 
-      current.messages.map(
-        (message, index) =>
-        <Message 
+    current.messageJsx.push(
+    	<UserMessage 
           name={ message.sender.name } 
           avatar={ message.sender.avatar }
           message={ message.text } 
@@ -539,10 +626,13 @@ class Chat extends Component {
           isMyMessage={ message.sender.name === this.props.user.name }
           key={ index }
           id={ index } /* 'key' seems to be a hidden prop */ />
-      );
+    );
 
-    return messages;
+  	this.setState({
+  		current: current
+  	});
   }
+  // // // // //
 
   render() {
     const rooms = this.state.rooms;
@@ -565,7 +655,7 @@ class Chat extends Component {
 			      transitionName="messageFade"
 			      transitionEnterTimeout={200}
 			      transitionLeaveTimeout={100}>
-            	{ this.getMessageList(current, now) }
+            	{ current.messageJsx }
             </ReactCSSTransitionGroup>
           </div>
           <div className="panel-footer">

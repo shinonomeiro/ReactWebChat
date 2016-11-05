@@ -182,14 +182,18 @@ class Debug extends Component {
   handleAddUsers(count) {
     for (let i=0; i<count; i++) {
       let name = `TestUser-${ this.addOffset + i }`;
-      this.props.addUser(new UserData(name, `/avatars/00${ Utils.randomRange(0, 10) }.png`));
+
+      this.props.addUser(
+        new UserData(name, `/avatars/00${ Utils.randomRange(0, 10) }.png`),
+        Date.now()
+      );
     }
 
     this.addOffset += 200;
   }
 
   handleRemoveUser(user) {
-    this.props.removeUser(user);
+    this.props.removeUser(user, Date.now());
   }
 
   handleSendMessageAsUser(user, message) {
