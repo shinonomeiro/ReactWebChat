@@ -26,14 +26,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
-      //Initialize tooltips and popovers
-      $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip(); 
-      });
 
-      $(document).ready(function(){
-        $('[data-toggle="popover"]').popover(); 
-      });
+    function initBS() {
+      //Initialize Bootstrap's tooltips and popovers
+      $('[data-toggle="tooltip"]').tooltip();
+      $('[data-toggle="popover"]').popover();
+      console.log("Tooltips and popovers initialized");
+    };
+
     </script>
   </head>
 

@@ -21,7 +21,7 @@ class ModalRoomJoin extends Component {
 	}
 
 	handleRoomJoin(e) {
-		if (this.state.roomName.length > 0) {
+		if (this.state.roomName) {
 
 			/* There is a strange bug with this operation where the 
 			previous input remains visible but is in fact an empty string.
@@ -45,7 +45,7 @@ class ModalRoomJoin extends Component {
 				id="room-join-modal" 
 				className="modal fade" 
 				role="dialog">
-			  <div className="modal-dialog modal-sm">
+			  <div className="modal-dialog modal-xs">
 
 			    <div className="modal-content">
 			      <div className="modal-header">
@@ -117,12 +117,31 @@ class Tabs extends Component {
 
   getUserList() {
   	const users = this.props.current.users;
-  	let users_li = '';
+  	let users_li = [];
 
   	users.map(user => { 
-  		user.name == this.props.user.name ? 
-  		users_li += `<li><strong>${user.name}</strong></li>` :
-  		users_li += `<li>${user.name}</li>`
+  		const avatarImg = 
+  			<img 
+  				src={ user.avatar }
+  				alt="///"
+  				width="30px"
+  				height="30px" />
+
+  		if (user.name === this.props.user.name) {
+  			users_li.push(
+  			<li className="text-center"> 
+  				{ avatarImg }
+  				<strong>
+  					{ user.name }
+  				</strong>
+  			</li>);
+  		} else {
+  			users_li.push(
+  			<li className="text-center">
+  				{ avatarImg }
+  				{ user.name }
+  			</li>);
+  		}
   	});
 
   	return users_li;
@@ -131,53 +150,55 @@ class Tabs extends Component {
   render() {
     return(
     	<div>
-    		<div className="row">
-    			<div className="col-xs-12">
-			      <ul className="nav nav-tabs">
-			        { this.getRoomNames() }
-			        <li 
-			          role="presentation" 
-			          key={ 'join' }>
-			          <a href="#"
-			      			data-toggle="modal" 
-		      				data-target="#room-join-modal">
-			          	[+]
-			          </a>
-		          </li>
-		          <li 
-			          role="presentation" 
-			          key={ 'leave' }
-			          className={ this.props.rooms.length > 0 ? "" : "disabled" }
-	      				onClick={ this.handleRoomLeave.bind(this) }>
-			          <a href="#">[-]</a>
-		          </li>
-	          	<li
-	          		role="presentation"
-	          		className="pull-right"
-	          		data-toggle="tooltip" 
-	      				data-placement="left" 
-	      				title="Users"
-	          		key={ 'userlist' }>
-	          		<a href="#" 
-			      			data-toggle="popover" 
-		      				data-placement="bottom"
-		      				data-html="true" 
-		      				title="Users"
-		      				data-content={ this.getUserList() }>
-			      			<span className="glyphicon glyphicon-user"></span>
-		      			</a>
-	          	</li> 
-			      </ul>
-		      </div>
-	      </div>
-	      <div className="row">
-	      	<div className="col-xs-12">
-	      		
-	      	</div>
-	      </div>
+	      <ul className="nav nav-tabs">
+	        { this.getRoomNames() }
+	        <li 
+	          role="presentation" 
+	          key={ 'join' }>
+	          <a href="#"
+	      			data-toggle="modal" 
+      				data-target="#room-join-modal">
+	          	[+]
+	          </a>
+          </li>
+          <li 
+	          role="presentation" 
+	          key={ 'leave' }
+	          className={ this.props.rooms.length > 0 ? "" : "disabled" }
+    				onClick={ this.handleRoomLeave.bind(this) }>
+	          <a href="#">[-]</a>
+          </li>
+        	<li
+        		role="presentation"
+        		className="dropdown pull-right"
+        		key={ 'userlist' }>
+            <a 
+            	href="#"
+            	data-toggle="dropdown"
+              className="dropdown-toggle">
+            	<span className="glyphicon glyphicon-user"></span>
+            </a>
+            <ul className="dropdown-menu">
+              { this.getUserList() }
+            </ul>
+        	</li> 
+	      </ul>
       </div>
     )
   }
+}
+
+// Chat view (message list, scrollable)
+class ChatPanel extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	// TODO Extract from <Chat> component
+
+	render() {
+		return(null);
+	}
 }
 
 function formatTimestamp(time) {
@@ -283,7 +304,7 @@ class InputField extends Component {
   }
 
   handleSendMessage(e) {
-    if (this.state.message.length > 0) {
+    if (this.state.message) {
       this.props.onSendMessage(this.state.message, this.isMessageSent.bind(this));
     }
   }
@@ -355,6 +376,8 @@ class Chat extends Component {
   }
 
   componentDidMount() {
+  	// Initialize Bootstrap's tooltips and popovers (required)
+  	window.initBS();
 
     // Join the room user has picked on Login screen
     this.handleRoomJoin(this.props.roomName);
@@ -464,7 +487,8 @@ class Chat extends Component {
 
   handleUserLeave(user) {
   	const current = this.state.current;
-  	current.users.splice(user, 1);
+  	const index = current.users.indexOf(user);
+  	current.users.splice(index, 1);
 
   	// TODO Notify
 
@@ -474,6 +498,10 @@ class Chat extends Component {
   }
 
   handleSendMessage(text, callback) {
+  	if (!text) {
+  		return;
+  	}
+
     const current = this.state.current;
     current.messages.push(new MessageData(this.props.user, text, Date.now()));
 
@@ -486,6 +514,10 @@ class Chat extends Component {
 
   // FOR DEBUG //
   handleSendMessageAsUser(user, text) {
+  	if (!text) {
+  		return;
+  	}
+
   	const current = this.state.current;
   	current.messages.push(new MessageData(user, text, Date.now()));
 
@@ -495,12 +527,8 @@ class Chat extends Component {
   }
   // // // // //
 
-  render() {
-    const rooms = this.state.rooms;
-    const current = this.state.current;
-    const now = this.state.now;
-
-    const messages = 
+  getMessageList(current, now) {
+  	const messages = 
       current.messages.map(
         (message, index) =>
         <Message 
@@ -512,6 +540,14 @@ class Chat extends Component {
           key={ index }
           id={ index } /* 'key' seems to be a hidden prop */ />
       );
+
+    return messages;
+  }
+
+  render() {
+    const rooms = this.state.rooms;
+    const current = this.state.current;
+    const now = this.state.now;
 
     return(
       <div className="container-fluid">
@@ -529,7 +565,7 @@ class Chat extends Component {
 			      transitionName="messageFade"
 			      transitionEnterTimeout={200}
 			      transitionLeaveTimeout={100}>
-            	{ messages }
+            	{ this.getMessageList(current, now) }
             </ReactCSSTransitionGroup>
           </div>
           <div className="panel-footer">

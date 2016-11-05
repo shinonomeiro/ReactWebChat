@@ -5,6 +5,13 @@ import Chat from './Chat';
 
 import './App.css';
 
+function Env() {
+
+}
+
+Env.pathToAvatars = '/avatars/';
+Env.pathToStickers = '/stickers/';
+
 function UserData(name, avatar) {
   this.name = name;
   this.avatar = avatar;
@@ -22,21 +29,35 @@ class App extends Component {
     };
   }
 
-  handleLogin(name, room) {
+  componentDidMount() {
+
+    // FOR DEBUG //
+    this.setState({
+      isLoggedIn: true,
+      userName: 'Frank',
+      roomName: 'Buddies',
+      avatar: '/avatars/001.png'  
+    });
+    // // // //
+  }
+
+  handleLogin(name, room, avatar) {
     this.setState({ 
       isLoggedIn: true,
       userName: name,
-      roomName: room 
+      roomName: room, 
+      avatar: avatar
     });
   }
 
   render() {
     const isLoggedIn = this.state.isLoggedIn;
-    const user = new UserData('Frank', '/avatars/001.png'); // TODO this.state.userName, this.state.avatar;
-    const roomName = 'Buddies'; // TODO this.state.roomName;
+    const user = new UserData(this.state.userName, this.state.avatar);
+    const roomName = this.state.roomName;
+    const avatar = this.state.avatar;
 
-    const panel = !isLoggedIn ? // FIXME
-    <Chat user={ user } roomName={ roomName } /> : // FIXME
+    const panel = isLoggedIn ? 
+    <Chat user={ user } roomName={ roomName } /> : 
     <Login onLogin={ this.handleLogin.bind(this) } />;
  
     return(panel);
@@ -44,4 +65,5 @@ class App extends Component {
 }
 
 export default App;
+export { Env };
 export { UserData };
