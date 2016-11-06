@@ -456,7 +456,7 @@ class InputField extends Component {
 
   render() {
     return(
-      <div className="input-group">
+      <div className={ 'input-group' + (this.props.rooms.length > 0 ? '' : ' hidden') }>
         <input 
           type="text" 
           className="form-control" 
@@ -738,6 +738,7 @@ class Chat extends Component {
 	        <div className="panel-footer">
 	          <InputField 
 	          	myself={ this.props.user }
+	          	rooms={ rooms }
 	          	onSendMessage={ this.handleSendMessage.bind(this) }
 	          	onSendStamp={ this.handleSendStamp.bind(this) } />
 	        </div>
