@@ -17,6 +17,10 @@
   height: 300px;
 }
 
+.dropdown-menu.userlist {
+  padding-left: 10px;
+}
+
 .media.user-message {
 
 }

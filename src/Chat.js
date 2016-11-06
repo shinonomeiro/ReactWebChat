@@ -104,8 +104,7 @@ class Tabs extends Component {
   }
 
  	getRoomNames() {
- 		let roomNames = this.props.rooms.map(
-      room => 
+ 		let roomNames = this.props.rooms.map(room => 
       <li 
         role="presentation" 
         key={ room.name } 
@@ -131,7 +130,6 @@ class Tabs extends Component {
   		if (user.name === this.props.user.name) {
   			users_li.push(
   			<li 
-  				className="text-center" 
   				key={ index }> 
   				{ avatarImg }
   				<strong>
@@ -141,7 +139,6 @@ class Tabs extends Component {
   		} else {
   			users_li.push(
   			<li 
-  				className="text-center" 
   				key={ index }>
   				{ avatarImg }
   				{ user.name }
@@ -182,7 +179,7 @@ class Tabs extends Component {
             	data-toggle="dropdown">
             	<span className="glyphicon glyphicon-user"></span>
             </a>
-            <ul className="dropdown-menu">
+            <ul className="dropdown-menu userlist">
               { this.getUserList() }
             </ul>
         	</li> 
@@ -489,7 +486,7 @@ function RoomData(name, users, scrollState) {
   this.name = name;
   this.users = users;
   this.messages = [];
-  this.messageJsx = [];
+  this.messagesAsJsx = [];
 
   // Offset in px from bottom of scroll view
   this.scrollState = scrollState || 0;
@@ -620,9 +617,9 @@ class Chat extends Component {
   	current.users.push(user);
 
   	const now = this.state.now;
-  	const index = current.messageJsx.length;
+  	const index = current.messagesAsJsx.length;
 
-  	current.messageJsx.push(
+  	current.messagesAsJsx.push(
   		<EventMessage
   			eventType="join"
   			user={ user }
@@ -642,9 +639,9 @@ class Chat extends Component {
   	current.users.splice(userIndex, 1);
 
   	const now = this.state.now;
-  	const index = current.messageJsx.length;
+  	const index = current.messagesAsJsx.length;
 
-  	current.messageJsx.push(
+  	current.messagesAsJsx.push(
   		<EventMessage
   			eventType="quit"
   			user={ user }
@@ -665,9 +662,9 @@ class Chat extends Component {
     current.messages.push(message);
 
     const now = this.state.now;
-    const index = current.messageJsx.length;
+    const index = current.messagesAsJsx.length;
 
-    current.messageJsx.push(
+    current.messagesAsJsx.push(
     	<UserTextMessage 
         name={ message.sender.name } 
         avatar={ message.sender.avatar }
@@ -693,9 +690,9 @@ class Chat extends Component {
     current.messages.push(message);
 
     const now = this.state.now;
-    const index = current.messageJsx.length;
+    const index = current.messagesAsJsx.length;
 
-    current.messageJsx.push(
+    current.messagesAsJsx.push(
     	<UserStampMessage 
         name={ message.sender.name } 
         avatar={ message.sender.avatar }
@@ -729,10 +726,10 @@ class Chat extends Component {
 	        </div>
 	        <div className="panel-body body-panel" id="scrollable">
 	          <ReactCSSTransitionGroup
-			      transitionName="messageFade"
-			      transitionEnterTimeout={200}
-			      transitionLeaveTimeout={100}>
-	          	{ current.messageJsx }
+  			      transitionName="messageFade"
+  			      transitionEnterTimeout={200}
+  			      transitionLeaveTimeout={100}>
+	          	{ current.messagesAsJsx }
 	          </ReactCSSTransitionGroup>
 	        </div>
 	        <div className="panel-footer">
