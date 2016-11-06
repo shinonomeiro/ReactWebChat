@@ -485,10 +485,10 @@ class InputField extends Component {
   }
 }
 
-function RoomData(name, users, messages, scrollState) {
+function RoomData(name, users, scrollState) {
   this.name = name;
   this.users = users;
-  this.messages =  [];
+  this.messages = [];
   this.messageJsx = [];
 
   // Offset in px from bottom of scroll view
