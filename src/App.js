@@ -56,11 +56,15 @@ class App extends Component {
     const roomName = this.state.roomName;
     const avatar = this.state.avatar;
 
-    const panel = isLoggedIn ? 
+    const page = isLoggedIn ? 
     <Chat user={ user } roomName={ roomName } /> : 
     <Login onLogin={ this.handleLogin.bind(this) } />;
  
-    return(panel);
+    return(
+      <div className="container-fluid">
+        { page }
+      </div>
+    );
   }
 }
 

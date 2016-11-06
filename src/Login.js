@@ -83,48 +83,46 @@ class Login extends Component {
     const avatar = this.state.avatar;
 
     return(
-      <div className="container">
-        <form>
-          <div className="form-group">
-            <label htmlFor="inputName">Name</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              id="inputName" 
-              onChange={ this.handleNameChange.bind(this) }
-              placeholder="Pick a name..." />
-          </div>
-          <div className="form-group">
-            <label htmlFor="chatroom">Chatroom</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              id="chatroom"
-              onChange={ this.handleRoomChange.bind(this) } 
-              placeholder="Input room name..." />
-          </div>
-          <div className="form-group">
-            <label htmlFor="chatroom">Avatar</label>
-              <div className="dropdown">
-                <img 
-                  src={ avatar }
-                  width="100px"
-                  height="100px"
-                  className="avatar-select dropdown-toggle" 
-                  data-toggle="dropdown" />
-                <div className="dropdown-menu">
-                  { this.getAvatarList() }
-                </div>
+      <form>
+        <div className="form-group">
+          <label htmlFor="inputName">Name</label>
+          <input 
+            type="text" 
+            className="form-control" 
+            id="inputName" 
+            onChange={ this.handleNameChange.bind(this) }
+            placeholder="Pick a name..." />
+        </div>
+        <div className="form-group">
+          <label htmlFor="chatroom">Chatroom</label>
+          <input 
+            type="text" 
+            className="form-control" 
+            id="chatroom"
+            onChange={ this.handleRoomChange.bind(this) } 
+            placeholder="Input room name..." />
+        </div>
+        <div className="form-group">
+          <label htmlFor="chatroom">Avatar</label>
+            <div className="dropdown">
+              <img 
+                src={ avatar }
+                width="100px"
+                height="100px"
+                className="avatar-select dropdown-toggle" 
+                data-toggle="dropdown" />
+              <div className="dropdown-menu">
+                { this.getAvatarList() }
               </div>
-          </div>
-          <button 
-            type="button" 
-            className="btn btn-default" 
-            onClick={ this.handleSubmit.bind(this) }>
-            Join
-          </button>
-        </form>
-      </div>
+            </div>
+        </div>
+        <button 
+          type="button" 
+          className="btn btn-default" 
+          onClick={ this.handleSubmit.bind(this) }>
+          Join
+        </button>
+      </form>
     );
   }
 }

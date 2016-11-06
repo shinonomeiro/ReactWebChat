@@ -640,38 +640,38 @@ class Chat extends Component {
     const now = this.state.now;
 
     return(
-      <div className="container-fluid">
-        <div className="panel panel-default">
-          <div className="panel-heading">
-            <Tabs
-            	user={ this.props.user } 
-              rooms={ rooms } 
-              current={ current } 
-              onRoomChange={ this.handleRoomChange.bind(this) }
-              onRoomLeave={ this.handleRoomLeave.bind(this) } />
-          </div>
-          <div className="panel-body body-panel" id="scrollable">
-            <ReactCSSTransitionGroup
+    	<div>
+	      <div className="panel panel-default">
+	        <div className="panel-heading">
+	          <Tabs
+	          	user={ this.props.user } 
+	            rooms={ rooms } 
+	            current={ current } 
+	            onRoomChange={ this.handleRoomChange.bind(this) }
+	            onRoomLeave={ this.handleRoomLeave.bind(this) } />
+	        </div>
+	        <div className="panel-body body-panel" id="scrollable">
+	          <ReactCSSTransitionGroup
 			      transitionName="messageFade"
 			      transitionEnterTimeout={200}
 			      transitionLeaveTimeout={100}>
-            	{ current.messageJsx }
-            </ReactCSSTransitionGroup>
-          </div>
-          <div className="panel-footer">
-            <InputField onSendMessage={ this.handleSendMessage.bind(this) }/>
-          </div>
-        </div>
+	          	{ current.messageJsx }
+	          </ReactCSSTransitionGroup>
+	        </div>
+	        <div className="panel-footer">
+	          <InputField onSendMessage={ this.handleSendMessage.bind(this) }/>
+	        </div>
+	      </div>
 
-        <Debug
-        	myself={ this.props.user }
-        	data={ this.state } 
-        	addUser={ this.handleUserJoin.bind(this) }
-        	removeUser={ this.handleUserLeave.bind(this) }
-        	sendMessageAsUser={ this.handleSendMessageAsUser.bind(this) } />
+	      <Debug
+	      	myself={ this.props.user }
+	      	data={ this.state } 
+	      	addUser={ this.handleUserJoin.bind(this) }
+	      	removeUser={ this.handleUserLeave.bind(this) }
+	      	sendMessageAsUser={ this.handleSendMessageAsUser.bind(this) } />
 
-        <ModalRoomJoin 
-        	onRoomJoin={ this.handleRoomJoin.bind(this) }/>
+	      <ModalRoomJoin 
+	      	onRoomJoin={ this.handleRoomJoin.bind(this) }/>
 
       </div>
     );
