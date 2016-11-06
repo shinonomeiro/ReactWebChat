@@ -179,8 +179,7 @@ class Tabs extends Component {
         		key={ 'userlist' }>
             <a 
             	href="#"
-            	data-toggle="dropdown"
-              className="dropdown-toggle">
+            	data-toggle="dropdown">
             	<span className="glyphicon glyphicon-user"></span>
             </a>
             <ul className="dropdown-menu">
@@ -399,7 +398,10 @@ class InputField extends Component {
 
   handleSendMessage(e) {
     if (this.state.message) {
-      this.props.onSendMessage(this.state.message, this.isMessageSent.bind(this));
+      this.props.onSendMessage(
+      	this.props.myself, 
+      	this.state.message, 
+      	this.handleSendSuccess.bind(this));
     }
   }
 
@@ -443,7 +445,8 @@ class InputField extends Component {
   	this.props.onSendStamp(path);
   }
 
-  isMessageSent(success) {
+  // Callback handler, called by <Chat>
+  handleSendSuccess(success) {
   	if (success) {
     	this.setState({
     		message: ''
@@ -463,7 +466,7 @@ class InputField extends Component {
         <span className="input-group-btn dropup">
         	<button 
             type="button" 
-            className="btn btn-default dropdown-toggle"
+            className="btn btn-default"
             data-toggle="dropdown">
             <span className="glyphicon glyphicon-star"></span>
           </button>
@@ -655,8 +658,9 @@ class Chat extends Component {
   	});
   }
 
-  handleSendMessage(text, callback) {
-  	const message = new MessageData(this.props.user, text, Date.now());
+  // Defined to accomodate messages sent from other users as well
+  handleSendMessage(sender, text, callback) {
+  	const message = new MessageData(sender, text, Date.now());
     const current = this.state.current;
     current.messages.push(message);
 
@@ -678,7 +682,9 @@ class Chat extends Component {
       current: current
     });
 
-    callback(true); // Clear input field
+    if (callback) {
+    	callback(true); // Clear input field
+    }
   }
 
   handleSendStamp(stamp) {
@@ -731,6 +737,7 @@ class Chat extends Component {
 	        </div>
 	        <div className="panel-footer">
 	          <InputField 
+	          	myself={ this.props.user }
 	          	onSendMessage={ this.handleSendMessage.bind(this) }
 	          	onSendStamp={ this.handleSendStamp.bind(this) } />
 	        </div>
@@ -739,9 +746,9 @@ class Chat extends Component {
 	      <Debug
 	      	myself={ this.props.user }
 	      	data={ this.state } 
-	      	addUser={ this.handleUserJoin.bind(this) }
-	      	removeUser={ this.handleUserLeave.bind(this) }
-	      	sendMessageAsUser={ this.handleSendMessageAsUser.bind(this) } />
+	      	onAddUser={ this.handleUserJoin.bind(this) }
+	      	onRemoveUser={ this.handleUserLeave.bind(this) }
+	      	onSendMessage={ this.handleSendMessage.bind(this) } />
 
 	      <ModalRoomJoin 
 	      	onRoomJoin={ this.handleRoomJoin.bind(this) }/>
@@ -750,34 +757,6 @@ class Chat extends Component {
     );
   }
 }
-
-// DEBUG ONLY //
-
-Chat.prototype.handleSendMessageAsUser = (user, text) => {
-  const message = new MessageData(user, text, Date.now());
-  const current = this.state.current;
-  current.messages.push(message);
-
-  const now = this.state.now;
-  const index = current.messageJsx.length;
-
-  current.messageJsx.push(
-    <UserTextMessage 
-      name={ message.sender.name } 
-      avatar={ message.sender.avatar }
-      message={ message.text } 
-      time={ Math.floor((now - message.time) / 1000 / 60) } 
-      isMyMessage={ message.sender.name === this.props.user.name }
-      key={ index }
-      id={ index } />
-  );
-
-  this.setState({
-    current: current
-  });
-}
-
-// // // // //
 
 export default Chat;
 export { MessageData };

@@ -187,7 +187,7 @@ class Debug extends Component {
     for (let i=0; i<count; i++) {
       let name = `TestUser-${ this.addOffset + i }`;
 
-      this.props.addUser(
+      this.props.onAddUser(
         new UserData(name, `/avatars/00${ Utils.randomRange(0, 10) }.png`),
         Date.now()
       );
@@ -197,11 +197,11 @@ class Debug extends Component {
   }
 
   handleRemoveUser(user) {
-    this.props.removeUser(user, Date.now());
+    this.props.onRemoveUser(user, Date.now());
   }
 
   handleSendMessageAsUser(user, message) {
-    this.props.sendMessageAsUser(user, message);
+    this.props.onSendMessage(user, message);
   }
 
   handleSendRandomMessages(count) {
@@ -211,7 +211,7 @@ class Debug extends Component {
         text += 'Boo ';
       }
 
-      this.props.sendMessageAsUser(this.props.myself, text + '!');
+      this.props.onSendMessage(this.props.myself, text + '!');
       text = '';
     }
   }
