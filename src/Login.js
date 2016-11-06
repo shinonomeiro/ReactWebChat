@@ -50,7 +50,7 @@ class Login extends Component {
     let cols = [[], [], []];
 
     for(let i=0; i<9; i++) {
-      const path = `/avatars/00${ i }.png`;
+      const path = Env.pathToAvatars + `00${ i }.png`;
 
       cols[Math.floor(i / 3)].push(
         <img 

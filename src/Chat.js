@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
+import { Env } from './App';
 import { UserData } from './App'
 import Debug from './Debug'
 
@@ -232,7 +233,11 @@ function formatTimestamp(time) {
 
 function Message(props) {
 	return(
-		null
+		<div 
+      className={ 'media ' + props.type } 
+      id={ "message-" + props.id }>
+      { props.children }
+    </div>
 	);
 }
 
@@ -248,8 +253,41 @@ Message.updateScrollBar = (messageId) => {
 	}
 }
 
+function UserMessage(props) {
+	return(
+		<Message
+    	type="user-message"
+    	id={ props.baseProps.id }>
+      { !props.baseProps.isMyMessage && 
+      <div className="media-left media-middle">
+        <img 
+          src={ props.baseProps.avatar } 
+          alt="(´Д`|||)"
+          className="img-circle avatar" />
+      </div>
+      }
+      <div className="media-body">
+        <span><strong>{ props.baseProps.name }</strong></span>
+        <small className="pull-right text-muted">
+          <span className="glyphicon glyphicon-time"></span>
+          { formatTimestamp(props.baseProps.time) }
+        </small>
+        { props.children }
+      </div>
+      { props.baseProps.isMyMessage && 
+      <div className="media-right">
+        <img 
+          src={ props.baseProps.avatar } 
+          alt="(´Д`|||)"
+          className="img-circle avatar" />
+      </div>
+      }
+    </Message>
+	);
+}
+
 // Chat message
-class UserMessage extends Component {
+class UserTextMessage extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -260,36 +298,36 @@ class UserMessage extends Component {
 
   render() {
     return(
-      <div 
-      	className="media user-message" 
-      	id={ "message-" + this.props.id }>
-        { !this.props.isMyMessage && 
-        <div className="media-left media-middle">
-          <img 
-            src={ this.props.avatar } 
-            alt="(´Д`|||)"
-            className="img-circle avatar" />
-        </div>
-        }
-        <div className="media-body">
-          <span><strong>{ this.props.name }</strong></span>
-          <small className="pull-right text-muted">
-            <span className="glyphicon glyphicon-time"></span>
-            { formatTimestamp(this.props.time) }
-          </small>
-          <div className="well message-text">{ this.props.message }</div>
-        </div>
-        { this.props.isMyMessage && 
-        <div className="media-right media-middle">
-          <img 
-            src={ this.props.avatar } 
-            alt="(´Д`|||)"
-            className="img-circle avatar" />
-        </div>
-        }
-      </div>
-    )
+      <UserMessage
+      	baseProps={ this.props }>
+        <div className="well message-text">{ this.props.message }</div>
+      </UserMessage>
+    );
   }
+}
+
+class UserStampMessage extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	componentDidMount() {
+		Message.updateScrollBar(this.props.id);
+	}
+
+	render() {
+		return(
+			<UserMessage
+      	baseProps={ this.props }>
+        <div>
+        <img 
+        	src={ this.props.message } 
+        	alt="(´Д`|||)" 
+        	className="message-stamp" />
+        </div>
+      </UserMessage>
+		);
+	}
 }
 
 // Chat events such as join, quit, etc.
@@ -323,9 +361,9 @@ class EventMessage extends Component {
 		}
 
 		return(
-			<div
-				className="media event-message"
-				id={ "message-" + this.props.id }>
+			<Message
+      	type="event-message"
+      	id={ this.props.id }>
 				<div className="media-body">
 					<img
 						src={ this.props.user.avatar }
@@ -334,7 +372,7 @@ class EventMessage extends Component {
 						height="30px" />
 					<span style={ color }>{ text }</span>
 				</div>
-			</div>
+			</Message>
 		);
 	}
 
@@ -365,6 +403,46 @@ class InputField extends Component {
     }
   }
 
+  getStampList() { // Same as Login screen's, consider refactoring
+    let list = [];
+    let cols = [[], [], []];
+
+    for(let i=0; i<9; i++) {
+      const path = Env.pathToStickers + `00${ i }.png`;
+
+      cols[Math.floor(i / 3)].push(
+        <img 
+          src={ path } 
+          className="avatar-item"
+          width="70px" 
+          height="70px"
+          key={ i } 
+          onClick={ this.handleSendStamp.bind(this) } />
+      );
+    }
+
+    for(let j=0; j<3; j++) {
+      list.push(
+        <div 
+          className="row"
+          key={ j }>
+          <div 
+            className="col-xs-12">
+            { cols[j] }
+          </div>
+        </div>
+      );
+    }
+
+    return list;
+  }
+
+  handleSendStamp(e) {
+  	const stamp = e.target.src.split('/').pop(); // Split absolute path (http://...)
+  	const path = Env.pathToStickers + stamp;
+  	this.props.onSendStamp(path);
+  }
+
   isMessageSent(success) {
   	if (success) {
     	this.setState({
@@ -382,12 +460,12 @@ class InputField extends Component {
           placeholder="Write a message..." 
           value={ this.state.message } 
           onChange={ this.handleChange.bind(this) } />
-        <span className="input-group-btn">
+        <span className="input-group-btn dropup">
         	<button 
             type="button" 
-            className="btn btn-default" 
-            onClick={ this.handleSendMessage.bind(this) }>
-            S
+            className="btn btn-default dropdown-toggle"
+            data-toggle="dropdown">
+            <span className="glyphicon glyphicon-star"></span>
           </button>
           <button 
             type="button" 
@@ -395,6 +473,9 @@ class InputField extends Component {
             onClick={ this.handleSendMessage.bind(this) }>
             Send
           </button>
+          <div className="dropdown-menu pull-right">
+            { this.getStampList() }
+          </div>
         </span>
       </div>
     )
@@ -544,7 +625,7 @@ class Chat extends Component {
   			user={ user }
   			time={ Math.floor((now - time) / 1000 / 60) }
   			key={ index }
-  			id={ index } />
+  			id={ index } /* 'key' seems to be a hidden prop */ />
   	);
 
   	this.setState({
@@ -575,10 +656,6 @@ class Chat extends Component {
   }
 
   handleSendMessage(text, callback) {
-  	if (!text) {
-  		return;
-  	}
-
   	const message = new MessageData(this.props.user, text, Date.now());
     const current = this.state.current;
     current.messages.push(message);
@@ -587,14 +664,14 @@ class Chat extends Component {
     const index = current.messageJsx.length;
 
     current.messageJsx.push(
-    	<UserMessage 
-          name={ message.sender.name } 
-          avatar={ message.sender.avatar }
-          message={ message.text } 
-          time={ Math.floor((now - message.time) / 1000 / 60) } 
-          isMyMessage={ message.sender.name === this.props.user.name }
-          key={ index }
-          id={ index } /* 'key' seems to be a hidden prop */ />
+    	<UserTextMessage 
+        name={ message.sender.name } 
+        avatar={ message.sender.avatar }
+        message={ message.text } 
+        time={ Math.floor((now - message.time) / 1000 / 60) } 
+        isMyMessage={ message.sender.name === this.props.user.name }
+        key={ index }
+        id={ index } />
     );
 
     this.setState({
@@ -604,35 +681,29 @@ class Chat extends Component {
     callback(true); // Clear input field
   }
 
-  // FOR DEBUG //
-  handleSendMessageAsUser(user, text) {
-  	if (!text) {
-  		return;
-  	}
+  handleSendStamp(stamp) {
+  	const message = new MessageData(this.props.user, stamp, Date.now());
+    const current = this.state.current;
+    current.messages.push(message);
 
-  	const message = new MessageData(user, text, Date.now());
-  	const current = this.state.current;
-  	current.messages.push(message);
-
-  	const now = this.state.now;
-  	const index = current.messageJsx.length;
+    const now = this.state.now;
+    const index = current.messageJsx.length;
 
     current.messageJsx.push(
-    	<UserMessage 
-          name={ message.sender.name } 
-          avatar={ message.sender.avatar }
-          message={ message.text } 
-          time={ Math.floor((now - message.time) / 1000 / 60) } 
-          isMyMessage={ message.sender.name === this.props.user.name }
-          key={ index }
-          id={ index } /* 'key' seems to be a hidden prop */ />
+    	<UserStampMessage 
+        name={ message.sender.name } 
+        avatar={ message.sender.avatar }
+        message={ message.text } 
+        time={ Math.floor((now - message.time) / 1000 / 60) } 
+        isMyMessage={ message.sender.name === this.props.user.name }
+        key={ index }
+        id={ index } />
     );
 
-  	this.setState({
-  		current: current
-  	});
+    this.setState({
+      current: current
+    });
   }
-  // // // // //
 
   render() {
     const rooms = this.state.rooms;
@@ -659,7 +730,9 @@ class Chat extends Component {
 	          </ReactCSSTransitionGroup>
 	        </div>
 	        <div className="panel-footer">
-	          <InputField onSendMessage={ this.handleSendMessage.bind(this) }/>
+	          <InputField 
+	          	onSendMessage={ this.handleSendMessage.bind(this) }
+	          	onSendStamp={ this.handleSendStamp.bind(this) } />
 	        </div>
 	      </div>
 
@@ -678,4 +751,33 @@ class Chat extends Component {
   }
 }
 
+// DEBUG ONLY //
+
+Chat.prototype.handleSendMessageAsUser = (user, text) => {
+  const message = new MessageData(user, text, Date.now());
+  const current = this.state.current;
+  current.messages.push(message);
+
+  const now = this.state.now;
+  const index = current.messageJsx.length;
+
+  current.messageJsx.push(
+    <UserTextMessage 
+      name={ message.sender.name } 
+      avatar={ message.sender.avatar }
+      message={ message.text } 
+      time={ Math.floor((now - message.time) / 1000 / 60) } 
+      isMyMessage={ message.sender.name === this.props.user.name }
+      key={ index }
+      id={ index } />
+  );
+
+  this.setState({
+    current: current
+  });
+}
+
+// // // // //
+
 export default Chat;
+export { MessageData };

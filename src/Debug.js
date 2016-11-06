@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+
 import { UserData } from './App';
+import { MessageData } from './Chat';
+
 import Utils from './Utils';
+import Chat from './Chat';
 
 class ModalSendMessageAsUser extends Component {
   constructor(props) {
@@ -214,7 +218,7 @@ class Debug extends Component {
 
   render() {
     return(
-      <div className="dropdown">
+      <div className="dropup">
         <button type="button" 
           className="btn btn-default dropdown-toggle" 
           data-toggle="dropdown">

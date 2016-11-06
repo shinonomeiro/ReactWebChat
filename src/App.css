@@ -1,3 +1,5 @@
+/* Login */
+
 .avatar-select {
   border: 1px solid gray;
   border-radius: 5px;
@@ -7,6 +9,8 @@
   border: 1px solid gray;
   border-radius: 5px;
 }
+
+/* Chat */
 
 .body-panel {
   overflow-y: auto;
@@ -22,6 +26,10 @@
   width: 50px;
 }
 
+.media.user-message .glyphicon-time {
+  margin-right: 5px;
+}
+
 .media.user-message .message-text {
   padding-top: 5px;
   padding-left: 10px;
@@ -30,8 +38,9 @@
   word-wrap: break-word;
 }
 
-.media.user-message .glyphicon-time {
-  margin-right: 5px;
+.media.user-message .message-stamp {
+  height: 150px;
+  width: 150px;
 }
 
 .media.event-message {
@@ -39,10 +48,6 @@
   padding-bottom: 1px;
   word-break: break-all; 
   word-wrap: break-word;
-}
-
-.media.stamp-message {
-  /* TODO */
 }
 
 .messageFade-enter {
