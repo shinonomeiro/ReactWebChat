@@ -211,6 +211,18 @@ class ChatPanel extends Component {
 	}
 }
 
+ChatPanel.updateScrollBar = (messageId) => {
+  const s = document.getElementById('scrollable');
+  const scrollBottom = s.scrollHeight - s.scrollTop - s.clientHeight;
+  const m = document.getElementById('message-' + messageId);
+
+  // If scrollview is already at the bottom
+  if (scrollBottom < m.clientHeight + 20) {
+    // Move alongside to display the new message
+    s.scrollTop = s.scrollHeight;
+  }
+}
+
 function formatTimestamp(time) {
   let label;
   if (time >= 60 * 24) {
@@ -246,18 +258,6 @@ function Message(props) {
 	);
 }
 
-Message.updateScrollBar = (messageId) => {
-	const s = document.getElementById('scrollable');
-	const scrollBottom = s.scrollHeight - s.scrollTop - s.clientHeight;
-	const m = document.getElementById('message-' + messageId);
-
-	// If scrollview is already at the bottom
-	if (scrollBottom < m.clientHeight + 20) {
-		// Move alongside to display the new message
-		s.scrollTop = s.scrollHeight;
-	}
-}
-
 function UserTextMessage(props) {
   return(
     <div className="well message-text">{ props.message }</div>
@@ -281,7 +281,7 @@ class UserMessage extends Component {
   }
 
   componentDidMount() {
-    Message.updateScrollBar(this.props.id);
+    ChatPanel.updateScrollBar(this.props.id);
   }
 
   render() {
@@ -330,7 +330,7 @@ class EventMessage extends Component {
 	}
 
 	componentDidMount() {
-		Message.updateScrollBar(this.props.id);
+		ChatPanel.updateScrollBar(this.props.id);
 	}
 
 	formatMessageFromType() {
@@ -737,3 +737,4 @@ class Chat extends Component {
 
 export default Chat;
 export { MessageData };
+export { UserTextMessage };

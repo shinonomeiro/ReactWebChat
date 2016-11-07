@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import { UserData } from './App';
 import { MessageData } from './Chat';
+import { UserTextMessage } from './Chat';
 
 import Utils from './Utils';
 import Chat from './Chat';
@@ -185,15 +186,18 @@ class Debug extends Component {
 
   handleAddUsers(count) {
     for (let i=0; i<count; i++) {
-      let name = `TestUser-${ this.addOffset + i }`;
+      setTimeout(() => {
+        let name = `TestUser-${ this.addOffset + i }`;
 
-      this.props.onAddUser(
-        new UserData(name, `/avatars/00${ Utils.randomRange(0, 10) }.png`),
-        Date.now()
-      );
+        this.props.onAddUser(
+          new UserData(name, `/avatars/00${ Utils.randomRange(0, 10) }.png`),
+          Date.now()
+        );
+      },
+      i * 30);
     }
 
-    this.addOffset += 200;
+    this.addOffset += 100;
   }
 
   handleRemoveUser(user) {
@@ -201,18 +205,20 @@ class Debug extends Component {
   }
 
   handleSendMessageAsUser(user, message) {
-    this.props.onSendMessage(user, message);
+    this.props.onSendMessage(user, UserTextMessage, message);
   }
 
   handleSendRandomMessages(count) {
     for (let i=0, text=''; i<count; i++) {
+      setTimeout(() => {
+        for (let j=0; j<Utils.randomRange(10, 100); j++) {
+          text += 'Boo ';
+        }
 
-      for (let j=0; j<Utils.randomRange(10, 100); j++) {
-        text += 'Boo ';
-      }
-
-      this.props.onSendMessage(this.props.myself, text + '!');
-      text = '';
+        this.props.onSendMessage(this.props.myself, UserTextMessage, text + '!');
+        text = '';
+      },
+      i * 100);
     }
   }
 
