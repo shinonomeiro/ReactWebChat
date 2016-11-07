@@ -195,10 +195,19 @@ class ChatPanel extends Component {
 		super(props);
 	}
 
-	// TODO Extract from <Chat> component
-
 	render() {
-		return(null);
+		return(
+      <div 
+        className="body-panel" 
+        id="scrollable">
+        <ReactCSSTransitionGroup
+          transitionName="messageFade"
+          transitionEnterTimeout={200}
+          transitionLeaveTimeout={100}>
+          { this.props.messagesAsJsx }
+        </ReactCSSTransitionGroup>
+      </div>
+    );
 	}
 }
 
@@ -255,7 +264,7 @@ function UserMessage(props) {
     	type="user-message"
     	id={ props.baseProps.id }>
       { !props.baseProps.isMyMessage && 
-      <div className="media-left media-middle">
+      <div className="media-left">
         <img 
           src={ props.baseProps.avatar } 
           alt="(´Д`|||)"
@@ -726,13 +735,9 @@ class Chat extends Component {
 	            onRoomChange={ this.handleRoomChange.bind(this) }
 	            onRoomLeave={ this.handleRoomLeave.bind(this) } />
 	        </div>
-	        <div className="panel-body body-panel" id="scrollable">
-	          <ReactCSSTransitionGroup
-  			      transitionName="messageFade"
-  			      transitionEnterTimeout={200}
-  			      transitionLeaveTimeout={100}>
-	          	{ current.messagesAsJsx }
-	          </ReactCSSTransitionGroup>
+	        <div className="panel-body">
+	          <ChatPanel
+              messagesAsJsx={ current.messagesAsJsx } />
 	        </div>
 	        <div className="panel-footer">
 	          <InputField 
