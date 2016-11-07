@@ -454,31 +454,32 @@ class InputField extends Component {
 
   render() {
     return(
-      <div className={ 'input-group' + (this.props.rooms.length > 0 ? '' : ' hidden') }>
-        <input 
-          type="text" 
-          className="form-control" 
-          placeholder="Write a message..." 
-          value={ this.state.message } 
-          onChange={ this.handleChange.bind(this) } />
-        <span className="input-group-btn dropup">
-        	<button 
-            type="button" 
-            className="btn btn-default"
-            data-toggle="dropdown">
-            <span className="glyphicon glyphicon-star"></span>
-          </button>
-          <button 
-            type="button" 
-            className="btn btn-default" 
-            onClick={ this.handleSendMessage.bind(this) }>
-            Send
-          </button>
-          <div className="dropdown-menu pull-right">
-            { this.getStampList() }
-          </div>
-        </span>
-      </div>
+      <form onSubmit={ this.handleSendMessage.bind(this) }>
+        <div className={ 'input-group' + (this.props.rooms.length > 0 ? '' : ' hidden') }>
+          <input 
+            type="text" 
+            className="form-control" 
+            placeholder="Write a message..." 
+            value={ this.state.message } 
+            onChange={ this.handleChange.bind(this) } />
+          <span className="input-group-btn dropup">
+          	<button 
+              type="button" 
+              className="btn btn-default"
+              data-toggle="dropdown">
+              <span className="glyphicon glyphicon-star"></span>
+            </button>
+            <button 
+              type="submit" 
+              className="btn btn-default">
+              Send
+            </button>
+            <div className="dropdown-menu pull-right">
+              { this.getStampList() }
+            </div>
+          </span>
+        </div>
+      </form>
     )
   }
 }
