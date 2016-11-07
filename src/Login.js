@@ -28,7 +28,7 @@ class Login extends Component {
   }
 
   handleAvatarChange(e) {
-    const file = e.target.src.split('/').pop(); // Split absolute path (http://...)
+    const file = e.target.src.split('/').pop();
     this.setState({ avatar: Env.pathToAvatars + file });
   }
 

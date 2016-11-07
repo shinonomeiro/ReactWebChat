@@ -437,7 +437,7 @@ class InputField extends Component {
   }
 
   handleSendStamp(e) {
-  	const stamp = e.target.src.split('/').pop(); // Split absolute path (http://...)
+  	const stamp = e.target.src.split('/').pop();
   	const path = Env.pathToStickers + stamp;
   	this.props.onSendStamp(path);
   }
@@ -445,6 +445,7 @@ class InputField extends Component {
   // Callback handler, called by <Chat>
   handleSendSuccess(success) {
   	if (success) {
+      // Clear input field
     	this.setState({
     		message: ''
     	});
@@ -612,18 +613,21 @@ class Chat extends Component {
   	});
   }
 
+  timestampInMin(time) {
+    return Math.floor((this.state.now - time) / 1000 / 60);
+  }
+
   handleUserJoin(user, time) {
   	const current = this.state.current;
   	current.users.push(user);
 
-  	const now = this.state.now;
   	const index = current.messagesAsJsx.length;
 
   	current.messagesAsJsx.push(
   		<EventMessage
   			eventType="join"
   			user={ user }
-  			time={ Math.floor((now - time) / 1000 / 60) }
+  			time={ this.timestampInMin(time) }
   			key={ index }
   			id={ index } /* 'key' seems to be a hidden prop */ />
   	);
@@ -638,14 +642,13 @@ class Chat extends Component {
   	const userIndex = current.users.indexOf(user);
   	current.users.splice(userIndex, 1);
 
-  	const now = this.state.now;
   	const index = current.messagesAsJsx.length;
 
   	current.messagesAsJsx.push(
   		<EventMessage
   			eventType="quit"
   			user={ user }
-  			time={ Math.floor((now - time) / 1000 / 60) }
+  			time={ this.timestampInMin(time) }
   			key={ index }
   			id={ index } />
   	);
@@ -661,7 +664,6 @@ class Chat extends Component {
     const current = this.state.current;
     current.messages.push(message);
 
-    const now = this.state.now;
     const index = current.messagesAsJsx.length;
 
     current.messagesAsJsx.push(
@@ -669,7 +671,7 @@ class Chat extends Component {
         name={ message.sender.name } 
         avatar={ message.sender.avatar }
         message={ message.text } 
-        time={ Math.floor((now - message.time) / 1000 / 60) } 
+        time={ this.timestampInMin(message.time) } 
         isMyMessage={ message.sender.name === this.props.user.name }
         key={ index }
         id={ index } />
@@ -680,7 +682,7 @@ class Chat extends Component {
     });
 
     if (callback) {
-    	callback(true); // Clear input field
+    	callback(true);
     }
   }
 
@@ -689,7 +691,6 @@ class Chat extends Component {
     const current = this.state.current;
     current.messages.push(message);
 
-    const now = this.state.now;
     const index = current.messagesAsJsx.length;
 
     current.messagesAsJsx.push(
@@ -697,7 +698,7 @@ class Chat extends Component {
         name={ message.sender.name } 
         avatar={ message.sender.avatar }
         message={ message.text } 
-        time={ Math.floor((now - message.time) / 1000 / 60) } 
+        time={ this.timestampInMin(message.time) }
         isMyMessage={ message.sender.name === this.props.user.name }
         key={ index }
         id={ index } />

@@ -32,12 +32,12 @@ class App extends Component {
   componentDidMount() {
 
     // FOR DEBUG //
-    this.setState({
-      isLoggedIn: true,
-      userName: 'Frank',
-      roomName: 'Buddies',
-      avatar: '/avatars/001.png'  
-    });
+    // this.setState({
+    //   isLoggedIn: true,
+    //   userName: 'Frank',
+    //   roomName: 'Buddies',
+    //   avatar: '/avatars/001.png'  
+    // });
     // // // //
   }
 
@@ -54,7 +54,6 @@ class App extends Component {
     const isLoggedIn = this.state.isLoggedIn;
     const user = new UserData(this.state.userName, this.state.avatar);
     const roomName = this.state.roomName;
-    const avatar = this.state.avatar;
 
     const page = isLoggedIn ? 
     <Chat user={ user } roomName={ roomName } /> : 

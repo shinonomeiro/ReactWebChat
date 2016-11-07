@@ -235,13 +235,6 @@ class Debug extends Component {
           </li>
           <li>
             <a 
-              href="#" 
-              onClick={ this.handleAddUsers.bind(this, 100) }>
-              Add 100 users
-            </a>
-          </li>
-          <li>
-            <a 
               href='#'
               data-toggle="modal" 
               data-target="#remove-user-modal">
