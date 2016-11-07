@@ -454,7 +454,7 @@ class InputField extends Component {
 
   render() {
     return(
-      <form onSubmit={ this.handleSendMessage.bind(this) }>
+      <form action="#" onSubmit={ this.handleSendMessage.bind(this) }>
         <div className={ 'input-group' + (this.props.rooms.length > 0 ? '' : ' hidden') }>
           <input 
             type="text" 
