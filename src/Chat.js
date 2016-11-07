@@ -258,81 +258,67 @@ Message.updateScrollBar = (messageId) => {
 	}
 }
 
-function UserMessage(props) {
-	return(
-		<Message
-    	type="user-message"
-    	id={ props.baseProps.id }>
-      { !props.baseProps.isMyMessage && 
-      <div className="media-left">
-        <img 
-          src={ props.baseProps.avatar } 
-          alt="(´Д`|||)"
-          className="img-circle avatar" />
-      </div>
-      }
-      <div className="media-body">
-        <span><strong>{ props.baseProps.name }</strong></span>
-        <small className="pull-right text-muted">
-          <span className="glyphicon glyphicon-time"></span>
-          { formatTimestamp(props.baseProps.time) }
-        </small>
-        { props.children }
-      </div>
-      { props.baseProps.isMyMessage && 
-      <div className="media-right">
-        <img 
-          src={ props.baseProps.avatar } 
-          alt="(´Д`|||)"
-          className="img-circle avatar" />
-      </div>
-      }
-    </Message>
-	);
+function UserTextMessage(props) {
+  return(
+    <div className="well message-text">{ props.message }</div>
+  );
 }
 
-// Chat message
-class UserTextMessage extends Component {
-	constructor(props) {
-		super(props);
-	}
+function UserStampMessage(props) {
+  return(
+    <div>
+      <img 
+        src={ props.message } 
+        alt="(´Д`|||)" 
+        className="message-stamp" />
+    </div>
+  );
+}
 
-	componentDidMount() {
-		Message.updateScrollBar(this.props.id);
-	}
+class UserMessage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    Message.updateScrollBar(this.props.id);
+  }
 
   render() {
-    return(
-      <UserMessage
-      	baseProps={ this.props }>
-        <div className="well message-text">{ this.props.message }</div>
-      </UserMessage>
-    );
-  }
-}
+    const MessageType = this.props.type;
 
-class UserStampMessage extends Component {
-	constructor(props) {
-		super(props);
-	}
-
-	componentDidMount() {
-		Message.updateScrollBar(this.props.id);
-	}
-
-	render() {
-		return(
-			<UserMessage
-      	baseProps={ this.props }>
-        <div>
-        <img 
-        	src={ this.props.message } 
-        	alt="(´Д`|||)" 
-        	className="message-stamp" />
+  	return(
+  		<Message
+      	type="user-message"
+      	id={ this.props.id }>
+        { !this.props.isMyMessage && 
+        <div className="media-left">
+          <img 
+            src={ this.props.avatar } 
+            alt="(´Д`|||)"
+            className="img-circle avatar" />
         </div>
-      </UserMessage>
-		);
-	}
+        }
+        <div className="media-body">
+          <span><strong>{ this.props.name }</strong></span>
+          <small className="pull-right text-muted">
+            <span className="glyphicon glyphicon-time"></span>
+            { formatTimestamp(this.props.time) }
+          </small>
+          <MessageType
+            message={ this.props.message } />
+        </div>
+        { this.props.isMyMessage && 
+        <div className="media-right">
+          <img 
+            src={ this.props.avatar } 
+            alt="(´Д`|||)"
+            className="img-circle avatar" />
+        </div>
+        }
+      </Message>
+  	);
+  }
 }
 
 // Chat events such as join, quit, etc.
@@ -404,8 +390,10 @@ class InputField extends Component {
 
   handleSendMessage(e) {
     if (this.state.message) {
+
       this.props.onSendMessage(
       	this.props.myself, 
+        UserTextMessage,
       	this.state.message, 
       	this.handleSendSuccess.bind(this));
     }
@@ -448,7 +436,12 @@ class InputField extends Component {
   handleSendStamp(e) {
   	const stamp = e.target.src.split('/').pop();
   	const path = Env.pathToStickers + stamp;
-  	this.props.onSendStamp(path);
+
+  	this.props.onSendMessage(
+      this.props.myself,
+      UserStampMessage,
+      path,
+      null);
   }
 
   // Callback handler, called by <Chat>
@@ -503,8 +496,9 @@ function RoomData(name, users, scrollState) {
   this.scrollState = scrollState || 0;
 }
 
-function MessageData(sender, text, time) {
+function MessageData(sender, type, text, time) {
   this.sender = sender;
+  this.type = type;
   this.text = text;
   this.time = time;
 }
@@ -669,15 +663,17 @@ class Chat extends Component {
   }
 
   // Defined to accomodate messages sent from other users as well
-  handleSendMessage(sender, text, callback) {
-  	const message = new MessageData(sender, text, Date.now());
+
+  handleSendMessage(sender, type, text, callback) {
+  	const message = new MessageData(sender, type, text, Date.now());
     const current = this.state.current;
     current.messages.push(message);
 
     const index = current.messagesAsJsx.length;
 
     current.messagesAsJsx.push(
-    	<UserTextMessage 
+    	<UserMessage 
+        type={ message.type }
         name={ message.sender.name } 
         avatar={ message.sender.avatar }
         message={ message.text } 
@@ -694,29 +690,6 @@ class Chat extends Component {
     if (callback) {
     	callback(true);
     }
-  }
-
-  handleSendStamp(stamp) {
-  	const message = new MessageData(this.props.user, stamp, Date.now());
-    const current = this.state.current;
-    current.messages.push(message);
-
-    const index = current.messagesAsJsx.length;
-
-    current.messagesAsJsx.push(
-    	<UserStampMessage 
-        name={ message.sender.name } 
-        avatar={ message.sender.avatar }
-        message={ message.text } 
-        time={ this.timestampInMin(message.time) }
-        isMyMessage={ message.sender.name === this.props.user.name }
-        key={ index }
-        id={ index } />
-    );
-
-    this.setState({
-      current: current
-    });
   }
 
   render() {
@@ -743,8 +716,7 @@ class Chat extends Component {
 	          <InputField 
 	          	myself={ this.props.user }
 	          	rooms={ rooms }
-	          	onSendMessage={ this.handleSendMessage.bind(this) }
-	          	onSendStamp={ this.handleSendStamp.bind(this) } />
+	          	onSendMessage={ this.handleSendMessage.bind(this) } />
 	        </div>
 	      </div>
 
