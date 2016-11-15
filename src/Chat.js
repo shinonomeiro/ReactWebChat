@@ -129,7 +129,7 @@ class Tabs extends Component {
 					width="30px"
 					height="30px" />
 
-			if (user.name === this.props.user.name) {
+			if (user.name === this.props.myself.name) {
 				users_li.push(
 				<li
 					key={ index }>
@@ -197,6 +197,48 @@ class ChatPanel extends Component {
 		super(props);
 	}
 
+	timestampInMin(time) {
+		return Math.floor((this.props.now - time) / 1000 / 60);
+	}
+
+	// Should eventually be moved to <ChatPanel>
+	getMessageList() {
+		const messagesAsJsx = [];
+
+		this.props.messages.forEach((message, index) => {
+			switch(message.type) {
+
+				case UserTextMessage:
+				case UserStampMessage:
+					messagesAsJsx.push(
+						<UserMessage
+							type={ message.type }
+							user={ message.sender }
+							message={ message.text }
+							time={ this.timestampInMin(message.time) }
+							isMyMessage={ message.sender.name === this.props.myself.name }
+							key={ index }
+							id={ index } />
+					);
+					break;
+
+				case JoinEventMessage:
+				case QuitEventMessage:
+					messagesAsJsx.push(
+						<EventMessage
+							type={ message.type }
+							user={ message.sender }
+							time={ this.timestampInMin(message.time) }
+							key={ index }
+							id={ index } />
+					);
+					break;
+			}
+		});
+
+		return messagesAsJsx;
+	}
+
 	render() {
 		return(
 			<div
@@ -206,7 +248,7 @@ class ChatPanel extends Component {
 					transitionName="messageFade"
 					transitionEnterTimeout={200}
 					transitionLeaveTimeout={100}>
-					{ this.props.messagesAsJsx }
+					{ this.getMessageList() }
 				</ReactCSSTransitionGroup>
 			</div>
 		);
@@ -294,14 +336,17 @@ class UserMessage extends Component {
 			<Message
 				type="user-message"
 				id={ this.props.id }>
-				{ !this.props.isMyMessage &&
-				<div className="media-left">
-					<img
-						src={ this.props.user.avatar }
-						alt="(´Д`|||)"
-						className="img-circle avatar" />
-				</div>
+
+				{ // Sender is someone else: avatar on the left
+					!this.props.isMyMessage &&
+					<div className="media-left">
+						<img
+							src={ this.props.user.avatar }
+							alt="(´Д`|||)"
+							className="img-circle avatar" />
+					</div>
 				}
+
 				<div className="media-body">
 					<span><strong>{ this.props.user.name }</strong></span>
 					<small className="pull-right text-muted">
@@ -311,14 +356,17 @@ class UserMessage extends Component {
 					<MessageType
 						message={ this.props.message } />
 				</div>
-				{ this.props.isMyMessage &&
-				<div className="media-right">
-					<img
-						src={ this.props.user.avatar }
-						alt="(´Д`|||)"
-						className="img-circle avatar" />
-				</div>
+
+				{ // Sender is myself: avatar on the right
+					this.props.isMyMessage &&
+					<div className="media-right">
+						<img
+							src={ this.props.user.avatar }
+							alt="(´Д`|||)"
+							className="img-circle avatar" />
+					</div>
 				}
+
 			</Message>
 		);
 	}
@@ -657,49 +705,6 @@ class Chat extends Component {
 		}
 	}
 
-	timestampInMin(time) {
-		return Math.floor((this.state.now - time) / 1000 / 60);
-	}
-
-	// Should eventually be moved to <ChatPanel>
-	getMessageList() {
-		const current = this.state.current;
-		const messagesAsJsx = [];
-
-		current.messages.forEach((message, index) => {
-			switch(message.type) {
-
-				case UserTextMessage:
-				case UserStampMessage:
-					messagesAsJsx.push(
-						<UserMessage
-							type={ message.type }
-							user={ message.sender }
-							message={ message.text }
-							time={ this.timestampInMin(message.time) }
-							isMyMessage={ message.sender.name === this.props.user.name }
-							key={ index }
-							id={ index } />
-					);
-					break;
-
-				case JoinEventMessage:
-				case QuitEventMessage:
-					messagesAsJsx.push(
-						<EventMessage
-							type={ message.type }
-							user={ message.sender }
-							time={ this.timestampInMin(message.time) }
-							key={ index }
-							id={ index } />
-					);
-					break;
-			}
-		});
-
-		return messagesAsJsx;
-	}
-
 	render() {
 		const rooms = this.state.rooms;
 		const current = this.state.current;
@@ -710,7 +715,7 @@ class Chat extends Component {
 					<div className="panel panel-default">
 						<div className="panel-heading">
 							<Tabs
-								user={ this.props.user }
+								myself={ this.props.user }
 								rooms={ rooms }
 								current={ current }
 								onRoomChange={ this.handleRoomChange.bind(this) }
@@ -718,7 +723,9 @@ class Chat extends Component {
 						</div>
 						<div className="panel-body">
 							<ChatPanel
-							messagesAsJsx={ this.getMessageList() } />
+								myself={ this.props.user }
+								messages={ current.messages }
+								now={ now } />
 						</div>
 						<div className="panel-footer">
 							<InputField
