@@ -279,7 +279,7 @@ class Debug extends Component {
           onSendMessageAsUser={ this.handleSendMessageAsUser.bind(this) } />
 
       </div>
-    )
+    );
   }
 }
 
