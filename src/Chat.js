@@ -111,7 +111,7 @@ class Tabs extends Component {
 			role="presentation"
 			key={ room.name }
 			className={ room === this.props.current ? "active" : "" }>
-			<a href="#" onClick={ this.handleRoomChange.bind(this, room) }>{ room.name }</a>
+			<a onClick={ this.handleRoomChange.bind(this, room) }>{ room.name }</a>
 		</li>);
 
 		return roomNames;
@@ -159,7 +159,7 @@ class Tabs extends Component {
 					<li
 						role="presentation"
 						key={ 'join' }>
-						<a href="#"
+						<a
 							data-toggle="modal"
 							data-target="#room-join-modal">
 							[+]
@@ -170,14 +170,13 @@ class Tabs extends Component {
 					key={ 'leave' }
 					className={ this.props.rooms.length > 0 ? "" : "disabled" }
 					onClick={ this.handleRoomLeave.bind(this) }>
-					<a href="#">[-]</a>
+					<a>[-]</a>
 				</li>
 					<li
 						role="presentation"
 						className="dropdown pull-right"
 						key={ 'userlist' }>
 					<a
-						href="#"
 						data-toggle="dropdown">
 						<span className="glyphicon glyphicon-user"></span>
 					</a>

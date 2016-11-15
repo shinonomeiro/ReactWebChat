@@ -54,7 +54,7 @@ class ModalSendMessageAsUser extends Component {
         role="dialog">
         <div className="modal-dialog modal-xs">
 
-          <div className="modal-content">
+          <form className="modal-content">
             <div className="modal-header">
               <h4 className="modal-title">[DEBUG] Send message as</h4>
             </div>
@@ -83,14 +83,14 @@ class ModalSendMessageAsUser extends Component {
                 Close
               </button>
               <button
-                type="button"
+                type="submit"
                 className="btn btn-default"
                 data-dismiss="modal"
                 onClick={ this.handleSubmit.bind(this) }>
                 Send
               </button>
             </div>
-          </div>
+          </form>
 
         </div>
       </div>
@@ -137,7 +137,7 @@ class ModalRemoveUser extends Component {
         role="dialog">
         <div className="modal-dialog modal-xs">
 
-          <div className="modal-content">
+          <form className="modal-content">
             <div className="modal-header">
               <h4 className="modal-title">[DEBUG] Remove user</h4>
             </div>
@@ -160,14 +160,14 @@ class ModalRemoveUser extends Component {
                 Close
               </button>
               <button
-                type="button"
+                type="submit"
                 className="btn btn-default"
                 data-dismiss="modal"
                 onClick={ this.handleSubmit.bind(this) }>
                 Remove
               </button>
             </div>
-          </div>
+          </form>
 
         </div>
       </div>
@@ -233,14 +233,12 @@ class Debug extends Component {
         <ul className="dropdown-menu">
           <li>
             <a
-              href="#"
               onClick={ this.handleAddUsers.bind(this, 10) }>
               Add 10 users
             </a>
           </li>
           <li>
             <a
-              href='#'
               data-toggle="modal"
               data-target="#remove-user-modal">
               Remove user
@@ -248,7 +246,6 @@ class Debug extends Component {
           </li>
           <li>
             <a
-              href="#"
               data-toggle="modal"
               data-target="#send-message-modal">
               Send message as user
@@ -256,14 +253,12 @@ class Debug extends Component {
           </li>
           <li>
             <a
-              href='#'
               onClick={ this.handleSendRandomMessages.bind(this, 10) }>
               Send 10 random messages
             </a>
           </li>
           <li>
             <a
-              href='#'
               onClick={ this.handleSendRandomMessages.bind(this, 100) }>
               Send 100 random messages
             </a>
