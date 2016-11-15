@@ -96,18 +96,26 @@ class Tabs extends Component {
 		this.props.onRoomChange(room);
 	}
 
-	handleRoomLeave(e) {
-		this.props.onRoomLeave();
+	handleRoomLeave(room, e) {
+		this.props.onRoomLeave(room);
 	}
 
 	getRoomNames() {
 		let roomNames = this.props.rooms.map(room =>
-		<li
-			role="presentation"
-			key={ room.name }
-			className={ room === this.props.current ? "active" : "" }>
-			<a onClick={ this.handleRoomChange.bind(this, room) }>{ room.name }</a>
-		</li>);
+			<li
+				role="presentation"
+				key={ room.name }
+				className={ room === this.props.current ? "active" : "" }>
+				<a>
+					<span onClick={ this.handleRoomChange.bind(this, room) }>
+						{ room.name }
+					</span>
+					<span onClick={ this.handleRoomLeave.bind(this, room) }>
+						&nbsp;[x]
+					</span>
+				</a>
+			</li>
+		);
 
 		return roomNames;
 	}
@@ -160,14 +168,7 @@ class Tabs extends Component {
 							data-target="#room-join-modal">
 							[+]
 						</a>
-				</li>
-				<li
-					role="presentation"
-					key={ 'leave' }
-					className={ this.props.rooms.length > 0 ? "" : "disabled" }
-					onClick={ this.handleRoomLeave.bind(this) }>
-					<a>[-]</a>
-				</li>
+					</li>
 					<li
 						role="presentation"
 						className="dropdown pull-right"
@@ -617,37 +618,37 @@ class Chat extends Component {
 		});
 	}
 
-	handleRoomLeave() {
-		// Failsafe (validation handled by <Tab>)
-		if (this.state.rooms.length < 1) {
-				console.error('[Chat] No room to leave');
-				return;
-		}
-
+	handleRoomLeave(room) {
 		const current = this.state.current;
 		const roomsList = this.state.rooms;
-		const index = roomsList.indexOf(current);
+		const index = roomsList.indexOf(room);
 		roomsList.splice(index, 1);
 
-		let newCurrent;
+		if (room === current) {
+			let newCurrent;
 
-		if (roomsList.length === 0) {
-			// Create dummy room
-			newCurrent = new RoomData(null, []);
-		} else if (index === 0) {
-			newCurrent = roomsList[0];
-		} else if (index === roomsList.length - 1) {
-			// Switch to the room that was to the right
-			newCurrent = roomsList[index];
+			if (roomsList.length === 0) {
+				// Create dummy room
+				newCurrent = new RoomData(null, []);
+			} else if (index === 0) {
+				newCurrent = roomsList[0];
+			} else if (index === roomsList.length - 1) {
+				// Switch to the room that was to the right
+				newCurrent = roomsList[index];
+			} else {
+				// Switch to the room that was to the left
+				newCurrent = roomsList[index - 1];
+			}
+
+			this.setState({
+				rooms: roomsList,
+				current: newCurrent
+			});
 		} else {
-			// Switch to the room that was to the left
-			newCurrent = roomsList[index - 1];
+			this.setState({
+				rooms: roomsList
+			});
 		}
-
-		this.setState({
-			rooms: roomsList,
-			current: newCurrent
-		});
 	}
 
 	handleUserJoin(user, time) {
