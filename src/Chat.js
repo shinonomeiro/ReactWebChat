@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 import { Env } from './App';
-import { UserData } from './App'
 import Debug from './Debug'
 
 // Modal (popup) prompting user to input room name
@@ -93,10 +92,6 @@ class ModalRoomJoin extends Component {
 
 // Tabs for switching between rooms + room join/leave
 class Tabs extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	handleRoomChange(room) {
 		this.props.onRoomChange(room);
 	}
@@ -121,7 +116,7 @@ class Tabs extends Component {
 		const users = this.props.current.users;
 		let users_li = [];
 
-		users.map((user, index) => {
+		users.forEach((user, index) => {
 			const avatarImg =
 				<img
 					src={ user.avatar }
@@ -192,10 +187,6 @@ class Tabs extends Component {
 
 // Chat view (message list, scrollable)
 class ChatPanel extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	timestampInMin(time) {
 		return Math.floor((this.props.now - time) / 1000 / 60);
 	}
@@ -231,6 +222,9 @@ class ChatPanel extends Component {
 							key={ index }
 							id={ index } />
 					);
+					break;
+
+				default:
 					break;
 			}
 		});
@@ -320,10 +314,6 @@ function UserStampMessage(props) {
 }
 
 class UserMessage extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	componentDidMount() {
 		ChatPanel.updateScrollBar(this.props.id);
 	}
@@ -385,10 +375,6 @@ function QuitEventMessage(props) {
 
 // Chat events such as join, quit, etc.
 class EventMessage extends Component {
-	constructor(props) {
-		super(props);
-	}
-
 	componentDidMount() {
 		ChatPanel.updateScrollBar(this.props.id);
 	}
@@ -453,6 +439,7 @@ class InputField extends Component {
 			cols[Math.floor(i / 3)].push(
 				<img
 					src={ path }
+					alt="(´Д`|||)"
 					className="avatar-item"
 					width="70px"
 					height="70px"

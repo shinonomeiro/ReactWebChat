@@ -4,7 +4,6 @@ import { UserData } from './App';
 import { UserTextMessage } from './Chat';
 
 import Utils from './Utils';
-import Chat from './Chat';
 
 class ModalSendMessageAsUser extends Component {
   constructor(props) {

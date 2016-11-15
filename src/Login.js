@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 import { Env } from './App'
 
@@ -55,6 +54,7 @@ class Login extends Component {
       cols[Math.floor(i / 3)].push(
         <img
           src={ path }
+          alt="(´Д`|||)"
           className="avatar-item"
           width="70px"
           height="70px"
@@ -107,6 +107,7 @@ class Login extends Component {
             <div className="dropdown">
               <img
                 src={ avatar }
+                alt="(´Д`|||)"
                 width="100px"
                 height="100px"
                 className="avatar-select dropdown-toggle"
