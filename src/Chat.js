@@ -453,7 +453,7 @@ class InputField extends Component {
 
 	render() {
 		return(
-			<form action="#" onSubmit={ this.handleSendMessage.bind(this) }>
+			<form>
 				<div className={ 'input-group' + (this.props.rooms.length > 0 ? '' : ' hidden') }>
 					<input
 						type="text"
@@ -470,7 +470,8 @@ class InputField extends Component {
 						</button>
 						<button
 							type="submit"
-							className="btn btn-default">
+							className="btn btn-default"
+							onClick={ this.handleSendMessage.bind(this) }>
 							Send
 						</button>
 						<div className="dropdown-menu pull-right">
