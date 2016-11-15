@@ -22,7 +22,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { 
+    this.state = {
       isLoggedIn: false,
       userName: '',
       roomName: ''
@@ -36,16 +36,16 @@ class App extends Component {
     //   isLoggedIn: true,
     //   userName: 'Frank',
     //   roomName: 'Buddies',
-    //   avatar: '/avatars/001.png'  
+    //   avatar: '/avatars/001.png'
     // });
     // // // //
   }
 
   handleLogin(name, room, avatar) {
-    this.setState({ 
+    this.setState({
       isLoggedIn: true,
       userName: name,
-      roomName: room, 
+      roomName: room,
       avatar: avatar
     });
   }
@@ -55,10 +55,10 @@ class App extends Component {
     const user = new UserData(this.state.userName, this.state.avatar);
     const roomName = this.state.roomName;
 
-    const page = isLoggedIn ? 
-    <Chat user={ user } roomName={ roomName } /> : 
+    const page = isLoggedIn ?
+    <Chat user={ user } roomName={ roomName } /> :
     <Login onLogin={ this.handleLogin.bind(this) } />;
- 
+
     return(
       <div className="container-fluid">
         { page }

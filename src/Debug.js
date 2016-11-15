@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
 import { UserData } from './App';
-import { MessageData } from './Chat';
 import { UserTextMessage } from './Chat';
 
 import Utils from './Utils';
@@ -49,9 +48,9 @@ class ModalSendMessageAsUser extends Component {
 
   render() {
     return(
-      <div 
-        id="send-message-modal" 
-        className="modal fade" 
+      <div
+        id="send-message-modal"
+        className="modal fade"
         role="dialog">
         <div className="modal-dialog modal-xs">
 
@@ -62,31 +61,31 @@ class ModalSendMessageAsUser extends Component {
             <div className="modal-body">
               <div className="form-group">
                 <label htmlFor="sel1">Select user:</label>
-                <select 
-                  className="form-control" 
+                <select
+                  className="form-control"
                   id="sel1"
                   onChange={ this.handleUserChange.bind(this) }>
                   { this.getUserList() }
                 </select>
               </div>
-              <input 
+              <input
                 id="send-message-modal-input"
-                type="text" 
-                className="form-control" 
-                placeholder="Input message..." 
+                type="text"
+                className="form-control"
+                placeholder="Input message..."
                 onChange={ this.handleMessageChange.bind(this) } />
             </div>
             <div className="modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-default" 
+              <button
+                type="button"
+                className="btn btn-default"
                 data-dismiss="modal">
                 Close
               </button>
-              <button 
-                type="button" 
-                className="btn btn-default" 
-                data-dismiss="modal" 
+              <button
+                type="button"
+                className="btn btn-default"
+                data-dismiss="modal"
                 onClick={ this.handleSubmit.bind(this) }>
                 Send
               </button>
@@ -132,9 +131,9 @@ class ModalRemoveUser extends Component {
 
   render() {
     return(
-      <div 
-        id="remove-user-modal" 
-        className="modal fade" 
+      <div
+        id="remove-user-modal"
+        className="modal fade"
         role="dialog">
         <div className="modal-dialog modal-xs">
 
@@ -145,8 +144,8 @@ class ModalRemoveUser extends Component {
             <div className="modal-body">
               <div className="form-group">
                 <label htmlFor="sel1">Select user:</label>
-                <select 
-                  className="form-control" 
+                <select
+                  className="form-control"
                   id="sel1"
                   onChange={ this.handleUserChange.bind(this) }>
                   { this.getUserList() }
@@ -154,16 +153,16 @@ class ModalRemoveUser extends Component {
               </div>
             </div>
             <div className="modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-default" 
+              <button
+                type="button"
+                className="btn btn-default"
                 data-dismiss="modal">
                 Close
               </button>
-              <button 
-                type="button" 
-                className="btn btn-default" 
-                data-dismiss="modal" 
+              <button
+                type="button"
+                className="btn btn-default"
+                data-dismiss="modal"
                 onClick={ this.handleSubmit.bind(this) }>
                 Remove
               </button>
@@ -225,46 +224,46 @@ class Debug extends Component {
   render() {
     return(
       <div className="dropup">
-        <button type="button" 
-          className="btn btn-default dropdown-toggle" 
+        <button type="button"
+          className="btn btn-default dropdown-toggle"
           data-toggle="dropdown">
           Debug
           <span className="caret"></span>
         </button>
         <ul className="dropdown-menu">
           <li>
-            <a 
-              href="#" 
+            <a
+              href="#"
               onClick={ this.handleAddUsers.bind(this, 10) }>
               Add 10 users
             </a>
           </li>
           <li>
-            <a 
+            <a
               href='#'
-              data-toggle="modal" 
+              data-toggle="modal"
               data-target="#remove-user-modal">
               Remove user
             </a>
           </li>
           <li>
-            <a 
+            <a
               href="#"
-              data-toggle="modal" 
+              data-toggle="modal"
               data-target="#send-message-modal">
               Send message as user
             </a>
           </li>
           <li>
-            <a 
-              href='#' 
+            <a
+              href='#'
               onClick={ this.handleSendRandomMessages.bind(this, 10) }>
               Send 10 random messages
             </a>
           </li>
           <li>
-            <a 
-              href='#' 
+            <a
+              href='#'
               onClick={ this.handleSendRandomMessages.bind(this, 100) }>
               Send 100 random messages
             </a>

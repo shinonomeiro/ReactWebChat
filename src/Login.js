@@ -8,7 +8,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { 
+    this.state = {
       userName: '',
       roomName: '',
       avatar: Env.pathToAvatars + '000.png'
@@ -38,8 +38,8 @@ class Login extends Component {
       &&  this.state.avatar) {
 
       this.props.onLogin(
-        this.state.userName, 
-        this.state.roomName, 
+        this.state.userName,
+        this.state.roomName,
         this.state.avatar
       );
     }
@@ -53,22 +53,22 @@ class Login extends Component {
       const path = Env.pathToAvatars + `00${ i }.png`;
 
       cols[Math.floor(i / 3)].push(
-        <img 
-          src={ path } 
+        <img
+          src={ path }
           className="avatar-item"
-          width="70px" 
+          width="70px"
           height="70px"
-          key={ i } 
+          key={ i }
           onClick={ this.handleAvatarChange.bind(this) } />
       );
     }
 
     for(let j=0; j<3; j++) {
       list.push(
-        <div 
+        <div
           className="row"
           key={ j }>
-          <div 
+          <div
             className="col-xs-12">
             { cols[j] }
           </div>
@@ -86,39 +86,39 @@ class Login extends Component {
       <form>
         <div className="form-group">
           <label htmlFor="inputName">Name</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            id="inputName" 
+          <input
+            type="text"
+            className="form-control"
+            id="inputName"
             onChange={ this.handleNameChange.bind(this) }
             placeholder="Pick a name..." />
         </div>
         <div className="form-group">
           <label htmlFor="chatroom">Chatroom</label>
-          <input 
-            type="text" 
-            className="form-control" 
+          <input
+            type="text"
+            className="form-control"
             id="chatroom"
-            onChange={ this.handleRoomChange.bind(this) } 
+            onChange={ this.handleRoomChange.bind(this) }
             placeholder="Input room name..." />
         </div>
         <div className="form-group">
           <label htmlFor="chatroom">Avatar</label>
             <div className="dropdown">
-              <img 
+              <img
                 src={ avatar }
                 width="100px"
                 height="100px"
-                className="avatar-select dropdown-toggle" 
+                className="avatar-select dropdown-toggle"
                 data-toggle="dropdown" />
               <div className="dropdown-menu">
                 { this.getAvatarList() }
               </div>
             </div>
         </div>
-        <button 
-          type="button" 
-          className="btn btn-default" 
+        <button
+          type="button"
+          className="btn btn-default"
           onClick={ this.handleSubmit.bind(this) }>
           Join
         </button>

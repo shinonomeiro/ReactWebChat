@@ -38,7 +38,7 @@
   padding-top: 5px;
   padding-left: 10px;
   padding-bottom: 5px;
-  word-break: break-all; 
+  word-break: break-all;
   word-wrap: break-word;
 }
 
@@ -50,7 +50,7 @@
 .media.event-message {
   padding-top: 1px;
   padding-bottom: 1px;
-  word-break: break-all; 
+  word-break: break-all;
   word-wrap: break-word;
 }
 
@@ -64,8 +64,8 @@
   opacity: 1;
   padding-left: 1px;
   padding-right: 1px;
-  transition: 
-    opacity 150ms ease-in, 
+  transition:
+    opacity 150ms ease-in,
     padding-left 150ms ease-out,
     padding-right 150ms ease-out;
 }
