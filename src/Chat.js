@@ -114,9 +114,8 @@ class Tabs extends Component {
 
 	getUserList() {
 		const users = this.props.current.users;
-		let users_li = [];
 
-		users.forEach((user, index) => {
+		let usersAsJsx = users.map((user, index) => {
 			const avatarImg =
 				<img
 					src={ user.avatar }
@@ -125,25 +124,27 @@ class Tabs extends Component {
 					height="30px" />
 
 			if (user.name === this.props.myself.name) {
-				users_li.push(
-				<li
-					key={ index }>
-					{ avatarImg }
-					<strong>
-						{ user.name }
-					</strong>
-				</li>);
+				return(
+					<li
+						key={ index }>
+						{ avatarImg }
+						<strong>
+							{ user.name }
+						</strong>
+					</li>
+				);
 			} else {
-				users_li.push(
-				<li
-					key={ index }>
-					{ avatarImg }
-					{ user.name }
-				</li>);
+				return (
+					<li
+						key={ index }>
+						{ avatarImg }
+						{ user.name }
+					</li>
+				);
 			}
 		});
 
-		return users_li;
+		return usersAsJsx;
 	}
 
 	render() {
